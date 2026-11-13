@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://seunome.dev/sitemap.xml

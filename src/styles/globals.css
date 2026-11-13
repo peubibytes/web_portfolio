@@ -1,0 +1,116 @@
+@import 'tailwindcss';
+
+/*
+ * Placa fotográfica de observatório.
+ * Placa (prata envelhecida) · tinta · um único acento: laranja sódio.
+ * Sem glow, sem gradientes decorativos.
+ */
+@theme {
+  --color-plate: #d4d0c5;
+  --color-plate-2: #c9c4b7;
+  --color-plate-dark: #161511;
+  --color-plate-dark-2: #211f1a;
+  --color-ink: #1b1a17;
+  --color-ink-soft: #55514a;
+  --color-graphite: #8c877c;
+  --color-paper: #ece8de;
+  --color-paper-soft: #a9a497;
+  --color-sodium: #ff5a1f;
+  --color-sodium-ink: #9e300a;
+
+  --font-display: 'Unbounded', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Newsreader', ui-serif, Georgia, serif;
+  --font-mono: 'Fragment Mono', ui-monospace, monospace;
+  --font-hand: 'Reenie Beanie', cursive;
+
+  --ease-slew: cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+@layer base {
+  html {
+    background: var(--color-plate);
+    color: var(--color-ink);
+    font-family: var(--font-serif);
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+    scroll-padding-top: 4.5rem;
+  }
+  body {
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+  ::selection {
+    background: var(--color-sodium);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-sodium-ink);
+    outline-offset: 3px;
+  }
+  .on-dark :focus-visible {
+    outline-color: var(--color-sodium);
+  }
+}
+
+@layer components {
+  /* A superfície da placa: uma única camada de emulsão, estática. */
+  .emulsion {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: 1;
+    mix-blend-mode: multiply;
+  }
+
+  /* Link de anotação: sublinhado a lápis que vira sódio no hover. */
+  .note-link {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--color-graphite);
+    transition: text-decoration-color 0.2s, color 0.2s;
+  }
+  .note-link:hover {
+    color: var(--color-sodium-ink);
+    text-decoration-color: var(--color-sodium);
+  }
+  .on-dark .note-link:hover {
+    color: var(--color-sodium);
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--color-ink-soft);
+  }
+  .on-dark .label {
+    color: var(--color-paper-soft);
+  }
+
+  .hand {
+    font-family: var(--font-hand);
+    color: var(--color-sodium-ink);
+    line-height: 1;
+  }
+  .on-dark .hand {
+    color: var(--color-sodium);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

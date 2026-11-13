@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Bundle budget (JS inicial < 150KB gzip, sem o chunk 3D)
+        run: |
+          total=0
+          for f in dist/assets/*.js; do
+            case "$f" in *scene*|*StarfieldScene*) continue;; esac
+            size=$(gzip -c "$f" | wc -c)
+            echo "$f: $size bytes gz"
+            total=$((total + size))
+          done
+          echo "total: $total bytes gz"
+          test "$total" -lt 153600
