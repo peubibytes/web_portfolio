@@ -6,9 +6,10 @@ import { Contact } from '../features/contact/Contact';
 import { projects } from '../content/projects';
 
 describe('ProjectSheet', () => {
-  it('é um diálogo acessível, mostra a lição e fecha com ESC', async () => {
+  it('é um diálogo acessível, mostra a lição (quando houver) e fecha com ESC', async () => {
     const onClose = vi.fn();
-    render(<ProjectSheet project={projects[0]!} index={0} onClose={onClose} />);
+    const project = { ...projects[0]!, lesson: 'Uma lição com mais de vinte caracteres.' };
+    render(<ProjectSheet project={project} index={0} onClose={onClose} />);
     expect(screen.getByRole('dialog', { name: projects[0]!.title })).toBeInTheDocument();
     expect(screen.getByText('O que eu faria diferente')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'fechar (esc)' })).toHaveFocus();

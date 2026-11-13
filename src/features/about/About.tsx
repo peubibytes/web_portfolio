@@ -11,7 +11,7 @@ export function About() {
   const years = new Date().getFullYear() - profile.observedSince;
   const rows = [
     { k: 'Base', v: `${profile.base.city} · ${formatLat(profile.base.lat)} ${formatLon(profile.base.lon)} · ${profile.base.utcOffset}` },
-    { k: 'Em atividade', v: `desde ${profile.observedSince} (${years} anos)` },
+    { k: 'Em atividade', v: `desde ${profile.observedSince} (${years} ${years === 1 ? 'ano' : 'anos'})` },
     { k: 'Idiomas', v: profile.languages.join(' · ') },
     { k: 'Instrumentos', v: profile.instruments.join(' · ') },
     { k: 'Aberto a', v: profile.openTo },

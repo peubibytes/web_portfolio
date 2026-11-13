@@ -95,7 +95,7 @@ describe('conteúdo', () => {
       expect(p.ra).toBeGreaterThanOrEqual(0);
       expect(p.ra).toBeLessThan(24);
       expect(Math.abs(p.dec)).toBeLessThanOrEqual(55);
-      expect(p.lesson.length).toBeGreaterThan(20);
+      if (p.lesson !== undefined) expect(p.lesson.length).toBeGreaterThan(20);
     }
     for (const e of experiences) {
       expect(e.scope).toBeGreaterThanOrEqual(1);
