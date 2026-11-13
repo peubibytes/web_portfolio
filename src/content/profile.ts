@@ -1,33 +1,26 @@
 import type { Profile } from './types';
 
-/*
- * TODO(conteúdo): o texto abaixo é um EXEMPLO de tom — direto, primeira pessoa,
- * com detalhes concretos. Substitua por fatos seus. Regras:
- *  - nada de "apaixonado por", "transformo", "soluções inovadoras"
- *  - números reais (irregulares), não redondos
- *  - uma opinião ou uma história, não uma lista de adjetivos
- */
 export const profile: Profile = {
-  name: 'Seu Nome',
-  handle: 'seunome',
-  role: 'Engenheiro de software',
-  tagline: 'Faço interfaces web que carregam antes de você perder a paciência — e explico o porquê em português claro.',
+  name: 'Pedro Barretto',
+  handle: 'barretto',
+  role: 'Estudante de Engenharia da Computação',
+  tagline:
+    'Construo sistemas, aplicações web e modelos de dados com Python, C#, Java e JavaScript — hoje, no e-commerce da 3corações.',
   bio: [
-    'Escrevo front-end há sete anos, quase sempre no lugar onde o produto fica lento, confuso ou as duas coisas.',
-    'Meu trabalho favorito até hoje foi apagar 41 mil linhas de um checkout que ninguém tinha coragem de mexer. O novo tem 6 mil, carrega em 1,4 s e não teve um incidente em 11 meses.',
-    'Fora do editor, fotografo o céu com uma câmera emprestada e um tripé torto — daí o tema deste site.',
+    'Estudo Engenharia da Computação na Unifor (2025–2029) e estagio em TI no e-commerce da 3corações, no time de Sistemas Especialistas.',
+    'No estágio cuido da plataforma VTEX — catálogo, preços e configurações da loja —, atendo chamados do diagnóstico à resolução e desenvolvo funcionalidades com JavaScript, TypeScript, React e Next.js.',
+    'Antes da TI, trabalhei com atendimento ao público em ambientes de alto volume. Foi ali que aprendi a resolver problema sob pressão e a pensar primeiro em quem está do outro lado do balcão — ou da tela.',
   ],
-  marginNotes: ['leia o 2º parágrafo', 'sim, 41 mil linhas', 'tripé ainda torto'],
-  photo: { src: '/avatar.svg', alt: 'Retrato de Seu Nome' },
-  base: { city: 'São Paulo', lat: -23.5505, lon: -46.6333, utcOffset: 'UTC−3' },
-  observedSince: 2019,
-  languages: ['Português (nativo)', 'Inglês (trabalho diário)'],
-  instruments: ['TypeScript', 'React', 'Node.js', 'WebGL', 'PostgreSQL'],
-  openTo: 'Vagas sênior de front-end e projetos de performance',
+  marginNotes: ['Unifor, turma de 2029', 'VTEX + React + Next.js', 'o usuário vem primeiro'],
+  photo: { src: '/avatar.svg', alt: 'Retrato de Pedro Barretto' },
+  base: { city: 'Fortaleza', lat: -3.7319, lon: -38.5267, utcOffset: 'UTC−3' },
+  observedSince: 2025,
+  languages: ['Português (nativo)', 'Inglês (avançado)'],
+  instruments: ['Python', 'C#', 'Java', 'C', 'JavaScript', 'TypeScript', 'React', 'Next.js', 'VTEX', 'Unity', 'Git'],
+  openTo: 'Oportunidades em Desenvolvimento de Software, Automação ou Dados',
   links: [
-    { label: 'Email', href: 'mailto:voce@exemplo.com', kind: 'email' },
-    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/seunome', kind: 'linkedin' },
-    { label: 'GitHub', href: 'https://github.com/seunome', kind: 'github' },
+    { label: 'Email', href: 'mailto:pv.barretto07@gmail.com', kind: 'email' },
+    { label: 'GitHub', href: 'https://github.com/peubibytes', kind: 'github' },
     { label: 'Currículo (PDF)', href: '/cv.pdf', kind: 'cv' },
   ],
 };

@@ -100,13 +100,15 @@ export function ProjectSheet({ project, index, onClose }: Props) {
                 <dd className="font-serif text-lg leading-relaxed">{e.v}</dd>
               </div>
             ))}
-            <div className="relative grid gap-2 border-t border-ink/25 pt-8 md:grid-cols-[8rem_1fr] md:gap-6">
-              <dt className="label pt-1">O que eu faria diferente</dt>
-              <dd className="font-serif text-lg leading-relaxed">
-                {project.lesson}
-                <span className="hand mt-2 block -rotate-1 text-2xl">↑ a parte mais útil desta ficha</span>
-              </dd>
-            </div>
+            {project.lesson && (
+              <div className="relative grid gap-2 border-t border-ink/25 pt-8 md:grid-cols-[8rem_1fr] md:gap-6">
+                <dt className="label pt-1">O que eu faria diferente</dt>
+                <dd className="font-serif text-lg leading-relaxed">
+                  {project.lesson}
+                  <span className="hand mt-2 block -rotate-1 text-2xl">↑ a parte mais útil desta ficha</span>
+                </dd>
+              </div>
+            )}
           </dl>
 
           <p className="label mt-12">{project.stack.join(' · ')}</p>

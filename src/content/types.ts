@@ -39,7 +39,7 @@ export interface Project {
   solution: string;
   result: string;
   /** O que deu errado ou o que você faria diferente. Honestidade vende. */
-  lesson: string;
+  lesson?: string;
   stack: string[];
   cover: { src: string; alt: string };
   links: { demo?: string; repo?: string };

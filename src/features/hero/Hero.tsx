@@ -59,7 +59,7 @@ export function Hero() {
         {/* identificação */}
         <motion.div variants={exposeSequence(0.14, 0.35)} initial="hidden" animate="show" className="md:col-span-6 md:pl-6">
           <motion.p variants={expose} className="label">
-            {profile.role.toLowerCase()} · {years} anos em atividade
+            {profile.role.toLowerCase()} · {years} {years === 1 ? "ano" : "anos"} em atividade
           </motion.p>
           <motion.h1 variants={expose} className="font-display mt-4 text-5xl leading-[0.95] font-light tracking-tight sm:text-6xl lg:text-8xl">
             {profile.name}
