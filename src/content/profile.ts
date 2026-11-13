@@ -20,7 +20,7 @@ export const profile: Profile = {
   openTo: 'Oportunidades em Desenvolvimento de Software, Automação ou Dados',
   links: [
     { label: 'Email', href: 'mailto:pv.barretto07@gmail.com', kind: 'email' },
-    { label: 'GitHub', href: 'https://github.com/peupibytes', kind: 'github' },
+    { label: 'GitHub', href: 'https://github.com/peubibytes', kind: 'github' },
     { label: 'Currículo (PDF)', href: '/cv.pdf', kind: 'cv' },
   ],
 };
