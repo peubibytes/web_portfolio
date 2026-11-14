@@ -1,9 +1,10 @@
 export const SECTIONS = [
-  { id: 'inicio', numeral: '0', nav: 'Início', term: 'Objeto', plain: 'apresentação' },
-  { id: 'sobre', numeral: 'I', nav: 'Sobre', term: 'Ficha do objeto', plain: 'quem sou eu' },
-  { id: 'experiencias', numeral: 'II', nav: 'Experiência', term: 'Curva de luz', plain: 'experiência profissional, de 2019 até hoje' },
-  { id: 'projetos', numeral: 'III', nav: 'Projetos', term: 'Carta de objetos', plain: 'projetos selecionados' },
-  { id: 'contato', numeral: 'IV', nav: 'Contato', term: 'Proposta de observação', plain: 'contato' },
+  { id: 'inicio', numeral: '00', nav: 'Conexão', term: 'Conexão', plain: 'apresentação' },
+  { id: 'sobre', numeral: '01', nav: 'Perfil', term: 'Perfil', plain: 'quem sou eu' },
+  { id: 'habilidades', numeral: '02', nav: 'Habilidades', term: 'Habilidades', plain: 'tecnologias' },
+  { id: 'experiencias', numeral: '03', nav: 'Registro', term: 'Registro de serviços', plain: 'experiência profissional, de 2024 até hoje' },
+  { id: 'projetos', numeral: '04', nav: 'Projetos', term: 'Projetos', plain: 'projetos no GitHub' },
+  { id: 'contato', numeral: '05', nav: 'Canal', term: 'Canal aberto', plain: 'contato' },
 ] as const;
 
 export type SectionId = (typeof SECTIONS)[number]['id'];

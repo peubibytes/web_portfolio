@@ -6,7 +6,7 @@ export interface Proposal {
 
 /** Monta um link mailto: — nada é enviado nem armazenado pelo site. */
 export function buildMailto(to: string, p: Proposal) {
-  const subject = p.subject.trim() || 'Proposta de observação';
+  const subject = p.subject.trim() || 'Contato pelo portfólio';
   const body = `${p.message.trim()}\n\n— ${p.name.trim()}`;
   const address = to.replace(/^mailto:/, '');
   return `mailto:${address}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

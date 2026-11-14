@@ -1,113 +1,124 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
 import { profile } from '../../content/profile';
-import { section } from '../../app/sections';
-import { SectionHeading } from '../../components/plate/SectionHeading';
-import { RegMarks } from '../../components/plate/RegMarks';
-import { expose, inViewOnce } from '../../lib/motion';
+import { SectionHeading } from '../../components/hud/SectionHeading';
 import { buildMailto } from './mailto';
 
 const field =
-  'mt-1 w-full border-0 border-b border-ink/40 bg-transparent px-0 py-2 font-serif text-lg outline-none transition-colors focus:border-sodium-ink focus-visible:outline-none';
+  'w-full border-0 bg-transparent px-0 py-2 text-[17px] text-text outline-none placeholder:text-text-3 focus-visible:outline-none';
+const wrap = 'mt-1 flex gap-2.5 border-b border-edge focus-within:border-b-2 focus-within:border-data';
 
 export function Contact() {
-  const s = section('contato');
   const email = profile.links.find((l) => l.kind === 'email');
   const others = profile.links.filter((l) => l.kind !== 'email' && l.kind !== 'cv');
+  const cv = profile.links.find((l) => l.kind === 'cv');
   const [form, setForm] = useState({ name: '', subject: '', message: '' });
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) window.location.href = buildMailto(email.href, form);
+    if (!email) return;
+    // Abre o app de email na hora. Nada é enviado ou guardado por este site.
+    window.location.href = buildMailto(email.href, form);
   };
 
   return (
-    <section id="contato" aria-labelledby="contact-title" className="mx-auto max-w-[88rem] px-4 py-24 md:px-10 md:py-36">
-      <SectionHeading id="contact-title" numeral={s.numeral} term={s.term} plain={s.plain} />
+    <section id="contato" aria-labelledby="contact-title" className="mx-auto max-w-[90rem] px-4 py-16 md:px-16 md:py-24">
+      <SectionHeading id="contact-title" sectionId="contato" />
 
-      <div className="mt-14 grid gap-14 md:mt-20 md:grid-cols-12 md:gap-8">
-        <motion.div variants={expose} initial="hidden" whileInView="show" viewport={inViewOnce} className="md:col-span-4 md:col-start-2">
-          <p className="font-serif text-2xl leading-snug">
+      <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-12 md:gap-x-6">
+        <div className="flex flex-col gap-7 md:col-span-5">
+          <p className="text-2xl leading-snug font-medium md:text-[30px]">
             Vaga, projeto ou uma pergunta sobre algo daqui? Escreva. Respondo em até dois dias úteis.
           </p>
-          <dl className="mt-10 space-y-4">
+          <dl className="border-t border-line">
             {email && (
-              <div>
-                <dt className="label">Email</dt>
+              <div className="flex flex-col gap-0.5 border-b border-line py-3 md:grid md:grid-cols-[8.75rem_1fr] md:gap-4 md:py-4">
+                <dt className="hud text-text-3">Email</dt>
                 <dd>
-                  <a href={email.href} className="note-link font-serif text-lg">
+                  <a href={email.href} className="link flex min-h-8 items-center font-mono text-sm md:text-[15px]">
                     {email.href.replace('mailto:', '')}
                   </a>
                 </dd>
               </div>
             )}
             {others.map((l) => (
-              <div key={l.href}>
-                <dt className="label">{l.label}</dt>
+              <div key={l.href} className="flex flex-col gap-0.5 border-b border-line py-3 md:grid md:grid-cols-[8.75rem_1fr] md:gap-4 md:py-4">
+                <dt className="hud text-text-3">{l.label}</dt>
                 <dd>
-                  <a href={l.href} target="_blank" rel="noopener noreferrer" className="note-link font-serif text-lg">
-                    {l.href.replace(/^https?:\/\/(www\.)?/, '')}
+                  <a href={l.href} target="_blank" rel="noopener noreferrer" className="link flex min-h-8 items-center font-mono text-sm md:text-[15px]">
+                    {l.href.replace(/^https?:\/\/(www\.)?/, '')} ↗
                   </a>
                 </dd>
               </div>
             ))}
+            {cv && (
+              <div className="flex flex-col gap-0.5 border-b border-line py-3 md:grid md:grid-cols-[8.75rem_1fr] md:gap-4 md:py-4">
+                <dt className="hud text-text-3">Currículo</dt>
+                <dd>
+                  <a href={cv.href} className="link flex min-h-8 items-center font-mono text-sm md:text-[15px]">
+                    cv.pdf ↓
+                  </a>
+                </dd>
+              </div>
+            )}
           </dl>
-        </motion.div>
+        </div>
 
-        <motion.form
-          variants={expose}
-          initial="hidden"
-          whileInView="show"
-          viewport={inViewOnce}
-          onSubmit={submit}
-          className="relative bg-plate-2/70 px-5 py-7 md:col-span-6 md:px-10 md:py-10"
-          aria-describedby="form-note"
-        >
-          <RegMarks />
-          <p className="label mb-6">FORMULÁRIO DE PROPOSTA</p>
-          <div className="grid gap-6 sm:grid-cols-2">
+        <form onSubmit={submit} aria-describedby="form-note" className="cut bg-line p-px md:col-span-6 md:col-start-7">
+          <div className="cut flex flex-col gap-5 bg-panel px-4 pt-5 pb-6 md:gap-6 md:px-8 md:pt-7 md:pb-8">
+            <div className="grid gap-5 sm:grid-cols-2 sm:gap-6">
+              <label className="block">
+                <span className="hud text-text-2">Seu nome *</span>
+                <span className={wrap}>
+                  <span aria-hidden="true" className="hud pt-2.5 text-text-3">&gt;</span>
+                  <input
+                    required
+                    autoComplete="name"
+                    aria-label="Seu nome"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    className={field}
+                  />
+                </span>
+              </label>
+              <label className="block">
+                <span className="hud text-text-2">Assunto</span>
+                <span className={wrap}>
+                  <span aria-hidden="true" className="hud pt-2.5 text-text-3">&gt;</span>
+                  <input
+                    aria-label="Assunto"
+                    value={form.subject}
+                    onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                    placeholder="Contato pelo portfólio"
+                    className={field}
+                  />
+                </span>
+              </label>
+            </div>
             <label className="block">
-              <span className="label">Seu nome</span>
-              <input
-                required
-                autoComplete="name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className={field}
-              />
+              <span className="hud text-text-2">Mensagem *</span>
+              <span className={`${wrap} items-start`}>
+                <span aria-hidden="true" className="hud pt-2.5 text-text-3">&gt;</span>
+                <textarea
+                  required
+                  rows={5}
+                  aria-label="Mensagem"
+                  value={form.message}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  className={`${field} resize-y`}
+                />
+              </span>
             </label>
-            <label className="block">
-              <span className="label">Assunto</span>
-              <input
-                value={form.subject}
-                onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                placeholder="Proposta de observação"
-                className={`${field} placeholder:text-ink/35`}
-              />
-            </label>
+
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
+              <p id="form-note" className="max-w-xs text-[13px] leading-relaxed text-text-3">
+                Abre o seu app de email com a mensagem pronta. Nada é enviado ou guardado por este site.
+              </p>
+              <button type="submit" className="btn !min-h-12 justify-center">
+                Escrever email →
+              </button>
+            </div>
           </div>
-          <label className="mt-6 block">
-            <span className="label">Mensagem</span>
-            <textarea
-              required
-              rows={5}
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-              className={`${field} resize-y`}
-            />
-          </label>
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-            <p id="form-note" className="label max-w-xs">
-              abre o seu app de email com a mensagem pronta — nada é enviado ou guardado por este site
-            </p>
-            <button
-              type="submit"
-              className="border border-ink px-6 py-3 font-mono text-sm transition-colors hover:bg-ink hover:text-plate"
-            >
-              Escrever email
-            </button>
-          </div>
-        </motion.form>
+        </form>
       </div>
     </section>
   );
