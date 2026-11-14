@@ -1,24 +1,11 @@
-import { formatLat, formatLon } from '../lib/geo';
 import { decodeFrame, stepProgress } from '../lib/decode';
-import { buildBanks } from '../lib/implantes';
-import { bootLines } from '../features/boot/useBoot';
+import { buildGroups } from '../lib/skills';
 import { SECTIONS } from '../app/sections';
 import { formatMonth, toYear } from '../lib/period';
 import { buildMailto } from '../features/contact/mailto';
 import { projects } from '../content/projects';
 import { experiences } from '../content/experiences';
 import { profile } from '../content/profile';
-
-describe('coordenadas', () => {
-  it('formata lat/lon de São Paulo', () => {
-    expect(formatLat(-23.5505)).toBe('23°33′S');
-    expect(formatLon(-46.6333)).toBe('46°38′O');
-  });
-  it('formata a base de Fortaleza', () => {
-    expect(formatLat(profile.base.lat)).toBe('3°44′S');
-    expect(formatLon(profile.base.lon)).toBe('38°32′O');
-  });
-});
 
 describe('períodos', () => {
   it('converte datas para ano decimal e texto', () => {
@@ -32,9 +19,9 @@ describe('períodos', () => {
 
 describe('decodificar', () => {
   it('é determinístico e termina exatamente no texto real', () => {
-    expect(decodeFrame('Varredura', 0.5, 3)).toBe(decodeFrame('Varredura', 0.5, 3));
-    expect(decodeFrame('Varredura', 1)).toBe('Varredura');
-    expect(decodeFrame('Varredura', 0).length).toBe('Varredura'.length);
+    expect(decodeFrame('Habilidades', 0.5, 3)).toBe(decodeFrame('Habilidades', 0.5, 3));
+    expect(decodeFrame('Habilidades', 1)).toBe('Habilidades');
+    expect(decodeFrame('Habilidades', 0).length).toBe('Habilidades'.length);
   });
   it('revela da esquerda para a direita e preserva espaços e pontuação', () => {
     const f = decodeFrame('Registro de serviços', 0.4, 5);
@@ -48,32 +35,31 @@ describe('decodificar', () => {
   });
 });
 
-describe('implantes', () => {
-  const banks = buildBanks(profile.instruments, experiences, projects);
-  const find = (n: string) => banks.flatMap((b) => b.implants).find((i) => i.name === n)!;
+describe('habilidades', () => {
+  const groups = buildGroups(profile.instruments, experiences, projects);
+  const find = (n: string) => groups.flatMap((g) => g.skills).find((s) => s.name === n)!;
   it('cobre todos os instrumentos do perfil, sem inventar nenhum', () => {
-    const names = banks.flatMap((b) => b.implants.map((i) => i.name)).sort();
+    const names = groups.flatMap((g) => g.skills.map((s) => s.name)).sort();
     expect(names).toEqual([...profile.instruments].sort());
   });
   it('deriva a evidência do currículo', () => {
     expect(find('React').evidence[0]).toMatchObject({ kind: 'serviço', label: '3corações', current: true });
     expect(find('React').current).toBe(true);
-    expect(find('C#').evidence[0]).toMatchObject({ kind: 'projeto' });
-    expect(find('Python').evidence[0]!.kind).toBe('currículo');
+    expect(find('TypeScript').evidence.map((e) => e.kind)).toEqual(['serviço', 'projeto', 'projeto']);
+    expect(find('Python').evidence).toEqual([]);
   });
 });
 
-describe('seções e log de boot', () => {
+describe('seções', () => {
   it('têm termo temático e termo comum, ids únicos', () => {
     expect(new Set(SECTIONS.map((s) => s.id)).size).toBe(SECTIONS.length);
     for (const s of SECTIONS) expect(s.plain.length).toBeGreaterThan(3);
   });
-  it('o log só contém dados reais do perfil', () => {
-    const lines = bootLines(new Date(2026, 10, 13));
-    expect(lines).toHaveLength(6);
-    expect(lines.join(' ')).toContain(profile.base.city);
-    expect(lines.join(' ')).toContain(profile.handle);
-    expect(lines[5]).toBe('> alvo travado.');
+  it('usa os nomes de seção em linguagem comum', () => {
+    const terms = SECTIONS.map((s) => s.term);
+    expect(terms).toContain('Perfil');
+    expect(terms).toContain('Habilidades');
+    expect(terms).toContain('Projetos');
   });
 });
 
@@ -86,11 +72,12 @@ describe('mailto', () => {
 });
 
 describe('conteúdo', () => {
-  it('ids únicos, coordenadas válidas e lição preenchida', () => {
+  it('ids únicos, origem válida e lição preenchida', () => {
     expect(new Set(projects.map((p) => p.id)).size).toBe(projects.length);
     expect(new Set(experiences.map((e) => e.id)).size).toBe(experiences.length);
     for (const p of projects) {
-      expect(['em andamento', 'concluído']).toContain(p.status);
+      expect(['github', 'roblox']).toContain(p.source);
+      if (p.source === 'github') expect(p.links.repo).toMatch(/^https:\/\/github\.com\//);
       if (p.lesson !== undefined) expect(p.lesson.length).toBeGreaterThan(20);
     }
   });

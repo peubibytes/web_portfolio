@@ -6,14 +6,10 @@ export interface Profile {
   tagline: string;
   /** Primeiro parágrafo é o destaque (maior). */
   bio: string[];
-  /** Notas curtas do operador na ficha (máx. ~5 palavras cada). */
-  marginNotes: string[];
   photo: { src: string; alt: string };
-  base: { city: string; lat: number; lon: number; utcOffset: string; timeZone: string };
+  base: { city: string };
   /** Formação, em uma linha. */
   education: string;
-  /** Ano em que começou a programar profissionalmente. */
-  observedSince: number;
   languages: string[];
   instruments: string[];
   /** O que faz hoje no trabalho atual, uma frente por item. */
@@ -35,8 +31,8 @@ export interface Project {
   id: string;
   title: string;
   year: number;
-  /** Derivado do resumo de cada projeto. */
-  status: 'em andamento' | 'concluído';
+  /** Onde o projeto vive: repositório no GitHub ou experiência no Roblox. */
+  source: 'github' | 'roblox';
   summary: string;
   problem: string;
   solution: string;
@@ -45,5 +41,6 @@ export interface Project {
   lesson?: string;
   stack: string[];
   cover: { src: string; alt: string };
+  /** repo: GitHub · demo: experiência no Roblox (ou outra demonstração). */
   links: { demo?: string; repo?: string };
 }

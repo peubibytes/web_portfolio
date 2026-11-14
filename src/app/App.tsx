@@ -1,7 +1,6 @@
-import { useCallback, useState } from 'react';
 import { Hero } from '../features/hero/Hero';
 import { About } from '../features/about/About';
-import { Implants } from '../features/implants/Implants';
+import { Skills } from '../features/skills/Skills';
 import { Experience } from '../features/experience/Experience';
 import { Projects } from '../features/projects/Projects';
 import { Contact } from '../features/contact/Contact';
@@ -9,26 +8,20 @@ import { profile } from '../content/profile';
 import { useActiveSection } from '../hooks/useActiveSection';
 import { MotionProvider, useMotion } from '../hooks/useMotion';
 import { Reticle } from '../components/hud/Reticle';
-import { SondaBar } from './SondaBar';
-import { MobileMenu } from './MobileMenu';
 
 function Shell() {
   const active = useActiveSection();
-  const { animate } = useMotion();
-  const [menu, setMenu] = useState(false);
-  const closeMenu = useCallback(() => setMenu(false), []);
+  const { animate, toggle } = useMotion();
   const repo = profile.links.find((l) => l.kind === 'github');
 
   return (
     <div className={animate ? '' : 'no-motion'}>
-      <SondaBar active={active} menuOpen={menu} onMenu={() => setMenu(true)} />
-      <MobileMenu open={menu} active={active} onClose={closeMenu} />
       <Reticle />
 
-      <main id="main" tabIndex={-1} className="pt-12 pb-24 outline-none md:pt-14 md:pb-0">
+      <main id="main" tabIndex={-1} className="pb-24 outline-none md:pb-0">
         <Hero />
         <About />
-        <Implants />
+        <Skills />
         <Experience />
         <Projects />
         <Contact />
@@ -45,12 +38,19 @@ function Shell() {
       )}
 
       <footer className="mx-auto max-w-[90rem] px-4 pb-10 md:px-16">
-        <p className="hud flex flex-wrap justify-between gap-x-8 gap-y-2 border-t border-line pt-4 text-text-3">
+        <p className="hud flex flex-wrap items-center justify-between gap-x-8 gap-y-2 border-t border-line pt-4 text-text-3">
           <span>
             © {new Date().getFullYear()} {profile.name}
           </span>
-          <span>sessão compilada em {__BUILD_DATE__}</span>
-          <span className="text-signal">canal mantido aberto pelo alvo</span>
+          <button
+            type="button"
+            onClick={toggle}
+            aria-pressed={animate}
+            aria-label="Movimento"
+            className="hud min-h-9 whitespace-nowrap border border-edge px-2.5 text-text-2 hover:text-text"
+          >
+            Mov · {animate ? 'on' : 'off'}
+          </button>
           {repo && (
             <a href={repo.href} target="_blank" rel="noopener noreferrer" className="link">
               código-fonte ↗

@@ -2,34 +2,23 @@ import * as motion from 'motion/react-m';
 import { profile } from '../../content/profile';
 import { experiences } from '../../content/experiences';
 import { projects } from '../../content/projects';
-import { buildBanks } from '../../lib/implantes';
+import { buildGroups } from '../../lib/skills';
 import { inViewOnce, lockIn, lockSequence } from '../../lib/motion';
 import { SectionHeading } from '../../components/hud/SectionHeading';
 
-const banks = buildBanks(profile.instruments, experiences, projects);
-const total = banks.reduce((n, b) => n + b.implants.length, 0);
+const groups = buildGroups(profile.instruments, experiences, projects);
 
-export function Implants() {
+export function Skills() {
   return (
-    <section id="implantes" aria-labelledby="implantes-title" className="mx-auto max-w-[90rem] px-4 py-16 md:px-16 md:py-24">
-      <div className="grid gap-6 md:grid-cols-12 md:items-end md:gap-x-6">
-        <div className="md:col-span-8">
-          <SectionHeading id="implantes-title" sectionId="implantes" />
-        </div>
-        <p className="text-[15px] leading-relaxed text-text-2 md:col-span-4 md:pb-2 md:text-base">
-          {total} módulos instalados. Ao lado de cada um, a evidência tirada do próprio currículo:{' '}
-          <b className="font-medium text-text">onde ele foi usado</b>. Nenhuma porcentagem inventada.
-        </p>
-      </div>
+    <section id="habilidades" aria-labelledby="habilidades-title" className="mx-auto max-w-[90rem] px-4 py-16 md:px-16 md:py-24">
+      <SectionHeading id="habilidades-title" sectionId="habilidades" />
 
       <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-3 md:gap-x-6">
-        {banks.map((b) => (
-          <div key={b.id}>
+        {groups.map((g) => (
+          <div key={g.id}>
             <div className="mb-2 flex justify-between border-b border-edge pb-2">
-              <h3 className="hud">
-                Banco {b.id} · {b.label}
-              </h3>
-              <span className="hud text-text-3">{b.implants.length}</span>
+              <h3 className="hud">{g.label}</h3>
+              <span className="hud text-text-3">{g.skills.length}</span>
             </div>
             <motion.ul
               variants={lockSequence(0.04)}
@@ -38,25 +27,25 @@ export function Implants() {
               viewport={inViewOnce}
               className="flex flex-col gap-3"
             >
-              {b.implants.map((im) => (
+              {g.skills.map((sk) => (
                 <motion.li
-                  key={im.name}
+                  key={sk.name}
                   variants={lockIn}
                   data-scan
                   tabIndex={0}
                   className={`brackets relative flex min-h-[60px] flex-wrap items-center gap-x-3 gap-y-1 border border-line bg-panel py-2 pr-3 pl-5 hover:bg-raised focus-visible:bg-raised ${
-                    im.current ? 'shadow-[inset_4px_0_0_var(--color-signal)]' : ''
+                    sk.current ? 'shadow-[inset_4px_0_0_var(--color-signal)]' : ''
                   }`}
                 >
                   <i aria-hidden="true" />
                   <i aria-hidden="true" />
                   <i aria-hidden="true" />
                   <i aria-hidden="true" />
-                  <span className="display text-[1.65rem] font-extrabold">{im.name}</span>
+                  <span className="display text-[1.65rem] font-extrabold">{sk.name}</span>
                   <span className="ml-auto flex flex-wrap justify-end gap-1.5">
-                    {im.evidence.map((e) => (
-                      <span key={`${e.kind}-${e.label}`} className={`tag ${e.kind === 'currículo' ? 'tag-ghost' : 'tag-data'}`}>
-                        {e.kind === 'currículo' ? e.label : `${e.kind} · ${e.label}`}
+                    {sk.evidence.map((e) => (
+                      <span key={`${e.kind}-${e.label}`} className="tag tag-data">
+                        {`${e.kind} · ${e.label}`}
                       </span>
                     ))}
                   </span>

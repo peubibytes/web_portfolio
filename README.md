@@ -27,11 +27,11 @@ npm run dev
 
 Todo o texto fica em `src/content/` (nenhum componente precisa mudar):
 
-- `profile.ts` — nome, bio, base, formação, notas do operador, instrumentos, links
+- `profile.ts` — nome, bio, cidade, formação, tecnologias, links
 - `experiences.ts` — experiências (o item com `end: 'present'` vira "Atual")
-- `projects.ts` — projetos (`status`: em andamento / concluído)
+- `projects.ts` — projetos (`source`: `github` com `links.repo`, ou `roblox` com `links.demo`)
 
-Os **implantes** (stack) não têm arquivo próprio: `lib/implantes.ts` cruza `profile.instruments`
+As **habilidades** (stack) não têm arquivo próprio: `lib/skills.ts` cruza `profile.instruments`
 com as `experiences` e os `projects` e mostra onde cada tecnologia aparece.
 Sem porcentagens: a evidência vem do currículo.
 
@@ -40,27 +40,26 @@ e `public/og.png` (1200×630) e atualize as meta tags em `index.html`, `robots.t
 
 ## Sistema de design
 
-**Vocabulário:** Sonda, alvo, camada, varredura, implante, arquivo, canal. Sempre acompanhado do
-termo comum ("Implantes — tecnologias"). Termos e marcas da franquia que inspirou o clima não são usados.
+**Vocabulário:** seções em linguagem comum (Perfil, Habilidades, Projetos), com Conexão, Registro e Canal
+como nomes de apoio. Termos e marcas da franquia que inspirou o clima não são usados.
 
 **Cor** (tokens em `src/styles/globals.css`, contraste AA verificado): `void`/`panel`/`raised` de fundo,
-e três acentos com um papel cada — `signal` (amarelo) = o alvo e o CTA, `data` (ciano) = interação,
-`breach` (magenta) = o operador (quebras, notas, erros). Nada brilha: cor chapada, contorno duro.
+e três acentos com um papel cada — `signal` (amarelo) = destaque e CTA, `data` (ciano) = interação,
+`breach` (magenta) = quebras e erros. Nada brilha: cor chapada, contorno duro.
 
 **Tipografia:** Big Shoulders (títulos) · Archivo (texto) · Martian Mono (dados). Todas OFL, Google Fonts.
 
 **Movimento — só quatro verbos** (`src/lib/motion.ts`, `src/lib/decode.ts`):
 1. **Decodificar** — texto passa de ruído ao valor real, em degraus
 2. **Travar** — brackets convergem no alvo (mira, módulos, cartões)
-3. **Romper** — a camada entra em fatias deslocadas, split RGB de 2 frames, no máx. 1 por segundo
-4. **Varrer** — o log da sessão e o envio do contato
+3. **Romper** — o título entra em fatias deslocadas, split RGB de 2 frames, no máx. 1 por segundo
+4. **Varrer** — a mira que acompanha o cursor
 
 Sem `prefers-reduced-motion` ou com o toggle "Mov · off", nenhum desses roda e a página já nasce no estado final.
-A intro (log da sessão) roda uma vez por sessão e pode ser pulada com Esc.
 
 ## Acessibilidade e performance
 
 - Texto decodificado: o leitor de tela recebe só o valor real; o ruído é `aria-hidden`.
-- Painel de arquivo com foco preso, ESC e link direto `#projeto-<id>`.
+- Painel de projeto com foco preso, ESC e link direto `#projeto-<id>`.
 - Sem WebGL. O retrato é uma imagem com halftone em CSS.
 - Mira (cursor) só com ponteiro fino e movimento ligado; o cursor nativo permanece.

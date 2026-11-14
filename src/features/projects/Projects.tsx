@@ -3,11 +3,8 @@ import * as motion from 'motion/react-m';
 import { projects } from '../../content/projects';
 import { inViewOnce, lockIn, lockSequence } from '../../lib/motion';
 import { SectionHeading } from '../../components/hud/SectionHeading';
-import { FilePanel } from './FilePanel';
+import { FilePanel, sourceLabel } from './FilePanel';
 import { useProjectHash } from './useProjectHash';
-
-const utf8Hex = (s: string) =>
-  Array.from(new TextEncoder().encode(s), (b) => b.toString(16).toUpperCase().padStart(2, '0')).join(' ');
 
 export function Projects() {
   const { openId, open, close } = useProjectHash();
@@ -16,14 +13,7 @@ export function Projects() {
 
   return (
     <section id="projetos" aria-labelledby="proj-title" className="mx-auto max-w-[90rem] px-4 py-16 md:px-16 md:py-24">
-      <div className="grid gap-6 md:grid-cols-12 md:items-end md:gap-x-6">
-        <div className="md:col-span-8">
-          <SectionHeading id="proj-title" sectionId="projetos" />
-        </div>
-        <p className="text-[15px] leading-relaxed text-text-2 md:col-span-4 md:pb-2 md:text-base">
-          {projects.length} arquivos. Abrir um = descriptografar: problema, solução e resultado. A prévia hex é o título real em UTF-8.
-        </p>
-      </div>
+      <SectionHeading id="proj-title" sectionId="projetos" />
 
       <motion.ul
         variants={lockSequence(0.08)}
@@ -32,27 +22,28 @@ export function Projects() {
         viewport={inViewOnce}
         className="mt-10 grid gap-5 md:mt-14 md:grid-cols-3 md:gap-6"
       >
-        {projects.map((p, i) => (
+        {projects.map((p) => (
           <motion.li key={p.id} variants={lockIn}>
             <button
               type="button"
               data-scan
               onClick={() => open(p.id)}
-              aria-label={`Abrir arquivo: ${p.title}`}
+              aria-label={`Ver detalhes: ${p.title}`}
               className="brackets group relative block w-full cursor-pointer text-left"
             >
               <span className="cut block bg-panel group-hover:bg-raised group-focus-visible:bg-raised">
                 <span className="flex justify-between border-b border-line px-4 py-3">
-                  <span className="hud">ARQ-{String(i + 1).padStart(2, '0')} · {p.year}</span>
-                  <span className={`hud ${p.status === 'em andamento' ? 'text-signal' : 'text-text-2'}`}>{p.status}</span>
+                  <span className="hud">{sourceLabel[p.source]}</span>
+                  <span className="hud text-text-2">{p.year}</span>
                 </span>
-                <span
-                  aria-hidden="true"
-                  className="block h-20 overflow-hidden border-b border-line bg-void px-4 py-3 font-mono text-[11px] leading-[1.7] tracking-[0.08em] break-words text-edge group-hover:text-data md:h-[9.5rem] md:text-xs"
-                >
-                  {utf8Hex(p.title)}
-                  <span className="block text-line">▒▒ ▒▒ ▒▒ ▒▒ ▒▒ ▒▒ ▒▒ ▒▒</span>
-                </span>
+                <img
+                  src={p.cover.src}
+                  alt=""
+                  width={480}
+                  height={300}
+                  loading="lazy"
+                  className="block aspect-[8/5] w-full border-b border-line bg-void object-cover"
+                />
                 <span className="flex flex-col gap-3 p-4">
                   <span className="display text-3xl md:text-[2.5rem]">{p.title}</span>
                   <span className="text-[15px] leading-relaxed text-text-2">{p.summary}</span>
@@ -63,7 +54,7 @@ export function Projects() {
                       </span>
                     ))}
                   </span>
-                  <span className="hud text-data">Descriptografar →</span>
+                  <span className="hud text-data">Ver detalhes →</span>
                 </span>
               </span>
               <i aria-hidden="true" />

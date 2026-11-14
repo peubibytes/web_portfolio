@@ -27,7 +27,7 @@ function Log({ items, small }: { items: string[]; small?: boolean }) {
   );
 }
 
-function Entry({ job, code, current }: { job: Job; code: string; current: boolean }) {
+function Entry({ job, current }: { job: Job; current: boolean }) {
   const [open, setOpen] = useState(false);
   const company = job.company.split('·');
   const shown = current || open ? job.highlights : job.highlights.slice(0, 1);
@@ -36,7 +36,6 @@ function Entry({ job, code, current }: { job: Job; code: string; current: boolea
     <li className="grid gap-3 md:grid-cols-[10rem_1fr] md:gap-x-6">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 pt-1 md:flex-col md:items-start">
         <Period job={job} />
-        <span className="hud text-text-3">registro {code}</span>
         {current && <span className="hud cut-s bg-signal px-2 py-1 font-medium text-void">Atual</span>}
       </div>
       <article className={`relative border-l pl-5 md:pl-7 ${current ? 'border-line' : 'border-line'}`}>
@@ -77,13 +76,8 @@ export function Experience() {
     <section id="experiencias" aria-labelledby="exp-title" className="mx-auto max-w-[90rem] px-4 py-16 md:px-16 md:py-24">
       <SectionHeading id="exp-title" sectionId="experiencias" />
       <ol className="mt-10 flex flex-col gap-9 md:mt-14 md:gap-10">
-        {experiences.map((job, i) => (
-          <Entry
-            key={job.id}
-            job={job}
-            code={String(experiences.length - i).padStart(2, '0')}
-            current={job.period.end === 'present'}
-          />
+        {experiences.map((job) => (
+          <Entry key={job.id} job={job} current={job.period.end === 'present'} />
         ))}
       </ol>
     </section>

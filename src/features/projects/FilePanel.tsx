@@ -14,7 +14,9 @@ interface Props {
   onNavigate?: (id: string) => void;
 }
 
-/** Arquivo descriptografado: painel que desliza e trava (N8). Foco preso, ESC e retorno do foco. */
+export const sourceLabel = { github: 'GitHub', roblox: 'Roblox' } as const;
+
+/** Detalhes do projeto: painel que desliza e trava (N8). Foco preso, ESC e retorno do foco. */
 export function FilePanel({ project, index, onClose, onNavigate }: Props) {
   const panel = useRef<HTMLDivElement>(null);
 
@@ -54,7 +56,6 @@ export function FilePanel({ project, index, onClose, onNavigate }: Props) {
     { k: 'Resultado', v: project.result, c: 'text-signal' },
     ...(project.lesson ? [{ k: 'O que eu faria diferente', v: project.lesson, c: 'text-text-2' }] : []),
   ];
-  const code = `ARQ-${String(index + 1).padStart(2, '0')}`;
   const prevP = projects[(index - 1 + projects.length) % projects.length]!;
   const nextP = projects[(index + 1) % projects.length]!;
   const { demo, repo } = project.links;
@@ -80,9 +81,9 @@ export function FilePanel({ project, index, onClose, onNavigate }: Props) {
         transition={snap}
       >
         <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-line bg-panel px-4 py-3 md:px-10">
-          <span className="hud text-signal">{code} · descriptografado</span>
+          <span className="hud text-signal">{sourceLabel[project.source]}</span>
           <span className="hud hidden text-text-3 md:inline">#projeto-{project.id}</span>
-          <nav aria-label="Outros arquivos" className="ml-auto hidden gap-2 md:flex">
+          <nav aria-label="Outros projetos" className="ml-auto hidden gap-2 md:flex">
             {onNavigate && (
               <>
                 <button type="button" onClick={() => onNavigate(prevP.id)} className="hud min-h-9 border border-edge px-2.5 text-text-2">
@@ -107,7 +108,7 @@ export function FilePanel({ project, index, onClose, onNavigate }: Props) {
         <div className="grid gap-8 px-4 py-8 md:grid-cols-9 md:gap-x-6 md:px-10 md:py-11">
           <div className="md:col-span-6">
             <p className="hud text-text-3">
-              {project.year} · {project.status}
+              {sourceLabel[project.source]} · {project.year}
             </p>
             <h2 id="file-title" className="display mt-3 text-5xl md:text-[5.25rem]">
               <DecodeText text={project.title} />
@@ -147,14 +148,14 @@ export function FilePanel({ project, index, onClose, onNavigate }: Props) {
                   {demo && (
                     <li>
                       <a href={demo} target="_blank" rel="noopener noreferrer" className="link">
-                        demo ↗
+                        {project.source === 'roblox' ? 'jogar no Roblox ↗' : 'demo ↗'}
                       </a>
                     </li>
                   )}
                   {repo && (
                     <li>
                       <a href={repo} target="_blank" rel="noopener noreferrer" className="link">
-                        repositório ↗
+                        repositório no GitHub ↗
                       </a>
                     </li>
                   )}

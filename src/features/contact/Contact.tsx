@@ -12,17 +12,12 @@ export function Contact() {
   const others = profile.links.filter((l) => l.kind !== 'email' && l.kind !== 'cv');
   const cv = profile.links.find((l) => l.kind === 'cv');
   const [form, setForm] = useState({ name: '', subject: '', message: '' });
-  const [sending, setSending] = useState(false);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    setSending(true);
-    // N9: barra 0→100% e o app de email abre. Nada é enviado ou guardado por este site.
-    window.setTimeout(() => {
-      window.location.href = buildMailto(email.href, form);
-      setSending(false);
-    }, 600);
+    // Abre o app de email na hora. Nada é enviado ou guardado por este site.
+    window.location.href = buildMailto(email.href, form);
   };
 
   return (
@@ -70,10 +65,6 @@ export function Contact() {
 
         <form onSubmit={submit} aria-describedby="form-note" className="cut bg-line p-px md:col-span-6 md:col-start-7">
           <div className="cut flex flex-col gap-5 bg-panel px-4 pt-5 pb-6 md:gap-6 md:px-8 md:pt-7 md:pb-8">
-            <div className="flex justify-between border-b border-edge pb-3">
-              <h3 className="hud">Compor transmissão</h3>
-              {email && <span className="hud hidden text-text-3 md:inline">destino · {email.href.replace('mailto:', '')}</span>}
-            </div>
             <div className="grid gap-5 sm:grid-cols-2 sm:gap-6">
               <label className="block">
                 <span className="hud text-text-2">Seu nome *</span>
@@ -118,21 +109,12 @@ export function Contact() {
               </span>
             </label>
 
-            {sending && (
-              <div role="status" className="hud text-data">
-                Transmitindo…
-                <span className="mt-2 block h-1.5 w-full bg-line" aria-hidden="true">
-                  <span className="block h-full animate-[fill_0.6s_steps(12)_forwards] bg-data" />
-                </span>
-              </div>
-            )}
-
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
               <p id="form-note" className="max-w-xs text-[13px] leading-relaxed text-text-3">
                 Abre o seu app de email com a mensagem pronta. Nada é enviado ou guardado por este site.
               </p>
-              <button type="submit" disabled={sending} className="btn !min-h-12 justify-center disabled:cursor-wait disabled:bg-line disabled:text-text-3">
-                Transmitir · escrever email →
+              <button type="submit" className="btn !min-h-12 justify-center">
+                Escrever email →
               </button>
             </div>
           </div>

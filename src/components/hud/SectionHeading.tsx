@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { section, SECTIONS, type SectionId } from '../../app/sections';
+import { section, type SectionId } from '../../app/sections';
 import { useMotion } from '../../hooks/useMotion';
 import { DecodeText } from './DecodeText';
 
@@ -11,13 +11,12 @@ interface Props {
   sectionId: SectionId;
 }
 
-/** Cabeçalho de camada: rótulo "Camada nn/05", título decodificado e entrada ROMPER. */
+/** Cabeçalho de seção: título decodificado, termo comum ao lado e entrada ROMPER. */
 export function SectionHeading({ id, sectionId }: Props) {
   const s = section(sectionId);
   const { animate } = useMotion();
   const host = useRef<HTMLDivElement>(null);
   const [breaking, setBreaking] = useState(false);
-  const last = String(SECTIONS.length - 1).padStart(2, '0');
 
   useEffect(() => {
     const el = host.current;
@@ -42,13 +41,8 @@ export function SectionHeading({ id, sectionId }: Props) {
     };
   }, [animate]);
 
-  const status = sectionId === 'contato' ? 'canal aberto pelo alvo' : 'trava aberta';
-
   return (
     <div>
-      <p className="hud mb-3 text-breach">
-        Camada {s.numeral}/{last} · {status}
-      </p>
       <div ref={host} className={`breach-host ${breaking ? 'breaking' : ''}`}>
         <h2 id={id} className="display text-[clamp(3.25rem,9vw,6rem)] leading-[0.88]">
           <DecodeText text={s.term} />

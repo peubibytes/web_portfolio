@@ -1,14 +1,11 @@
 import * as motion from 'motion/react-m';
 import { profile } from '../../content/profile';
 import { experiences } from '../../content/experiences';
-import { formatLat, formatLon } from '../../lib/geo';
 import { snap } from '../../lib/motion';
 import { useMotion } from '../../hooks/useMotion';
-import { useBoot } from '../boot/useBoot';
 
 export function Hero() {
   const { animate } = useMotion();
-  const { lines, done, skip } = useBoot();
   const [first, ...rest] = profile.name.split(' ');
   const current = experiences.find((e) => e.period.end === 'present');
   const email = profile.links.find((l) => l.kind === 'email');
@@ -18,22 +15,16 @@ export function Hero() {
     <section
       id="inicio"
       aria-labelledby="hero-title"
-      className="mx-auto grid min-h-[calc(100dvh-3.5rem)] max-w-[90rem] items-center gap-10 px-4 py-10 md:grid-cols-12 md:gap-x-6 md:px-16 md:py-12"
+      className="mx-auto grid min-h-dvh max-w-[90rem] items-center gap-10 px-4 py-10 md:grid-cols-12 md:gap-x-6 md:px-16 md:py-12"
     >
       <div className="flex flex-col gap-6 md:col-span-7 md:gap-7">
-        <p className="hud flex flex-wrap gap-x-5 gap-y-1 text-text-3">
-          <span className="text-signal">■ Alvo travado</span>
-          <span>ID · {profile.handle}</span>
-          {github && <span className="hidden md:inline">fonte · {github.href.replace(/^https?:\/\//, '')}</span>}
-        </p>
-
         <h1 id="hero-title" className="display text-[clamp(5.25rem,13vw,10.5rem)] leading-[0.86]">
           <span className="block">{first}</span>{' '}
           <motion.span
             className="mt-2 inline-block"
-            initial={animate && !done ? { clipPath: 'inset(0 100% 0 0)' } : false}
+            initial={animate ? { clipPath: 'inset(0 100% 0 0)' } : false}
             animate={{ clipPath: 'inset(0 0% 0 0)' }}
-            transition={{ ...snap, delay: 0.6, duration: 0.16 }}
+            transition={{ ...snap, delay: 0.2, duration: 0.16 }}
           >
             <span className="cut inline-block bg-signal px-[0.15em] pt-[0.08em] text-void">{rest.join(' ')}</span>
           </motion.span>
@@ -67,7 +58,7 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 md:col-span-5">
+      <div className="md:col-span-5">
         <div data-scan className="brackets relative mx-2 aspect-[5/6] max-h-[30rem] bg-panel">
           <i aria-hidden="true" />
           <i aria-hidden="true" />
@@ -85,39 +76,7 @@ export function Hero() {
           />
           <div aria-hidden="true" className="halftone absolute inset-0 text-void/70" />
           <div aria-hidden="true" className="portrait-scan absolute inset-x-0 top-0 h-1/6 bg-data/40" />
-          <p className="hud absolute right-3 bottom-3 text-right text-[11px] text-text">
-            Base · {profile.base.city}
-            <br />
-            {formatLat(profile.base.lat)} {formatLon(profile.base.lon)} · {profile.base.utcOffset}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div className="border border-line p-3">
-            <div className="flex items-center justify-between">
-              <h2 className="hud text-text-3">Log da sessão</h2>
-              {!done && (
-                <button type="button" onClick={skip} className="hud min-h-7 border border-data px-1.5 text-[10px] text-data">
-                  pular conexão [esc]
-                </button>
-              )}
-            </div>
-            <ol className="mt-2 min-h-[8.5rem] font-mono text-[11px] leading-relaxed text-text-2">
-              {lines.map((l, i) => (
-                <li key={i} className={l.includes('travas ativas') ? 'text-signal' : undefined}>
-                  {l}
-                </li>
-              ))}
-            </ol>
-          </div>
-          <div className="border border-line p-3">
-            <h2 className="hud text-text-3">Idiomas</h2>
-            <ul className="mt-2 text-[15px] leading-relaxed">
-              {profile.languages.map((l) => (
-                <li key={l}>{l}</li>
-              ))}
-            </ul>
-          </div>
+          <p className="hud absolute right-3 bottom-3 text-right text-[11px] text-text">{profile.base.city}</p>
         </div>
       </div>
     </section>

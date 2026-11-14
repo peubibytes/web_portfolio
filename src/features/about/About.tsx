@@ -1,6 +1,5 @@
 import { profile } from '../../content/profile';
 import { experiences } from '../../content/experiences';
-import { formatLat, formatLon } from '../../lib/geo';
 import { SectionHeading } from '../../components/hud/SectionHeading';
 
 export function About() {
@@ -10,20 +9,9 @@ export function About() {
   const rows: { k: string; v: React.ReactNode }[] = [
     { k: 'Nome', v: profile.name },
     { k: 'Formação', v: profile.education },
-    ...(current ? [{ k: 'Atual', v: `${current.role} · ${current.company.split('·')[0]!.trim()}` }] : []),
-    {
-      k: 'Base',
-      v: (
-        <>
-          {profile.base.city}{' '}
-          <span className="font-mono text-[13px] text-text-2">
-            · {formatLat(profile.base.lat)} {formatLon(profile.base.lon)} · {profile.base.utcOffset}
-          </span>
-        </>
-      ),
-    },
+    ...(current ? [{ k: 'Profissional', v: `${current.role} · ${current.company.split('·')[0]!.trim()}` }] : []),
+    { k: 'Base', v: profile.base.city },
     { k: 'Idiomas', v: profile.languages.join(' · ') },
-    { k: 'Na área desde', v: <span className="font-mono text-[15px]">{profile.observedSince}</span> },
     {
       k: 'Atuação',
       v: (
@@ -42,11 +30,7 @@ export function About() {
 
       <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-12 md:gap-x-6">
         <div className="cut bg-line p-px md:col-span-5 md:self-start">
-          <div className="cut relative overflow-hidden bg-panel px-4 pt-4 pb-1.5 md:px-6 md:pt-5">
-            <div className="flex justify-between border-b border-edge pb-2.5">
-              <h3 className="hud">Ficha do alvo</h3>
-              <span className="hud text-text-3">{rows.length} campos</span>
-            </div>
+          <div className="cut relative overflow-hidden bg-panel px-4 pt-1 pb-1.5 md:px-6">
             <dl>
               {rows.map((r, i) => (
                 <div
@@ -68,16 +52,6 @@ export function About() {
               {p}
             </p>
           ))}
-          <div className="border-t border-line pt-4">
-            <h3 className="hud mb-3 text-text-3">Notas do operador</h3>
-            <ul className="flex flex-wrap gap-2.5">
-              {profile.marginNotes.map((n) => (
-                <li key={n} className="hud border border-breach px-2.5 py-1.5 text-breach">
-                  {n}
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </div>
     </section>
