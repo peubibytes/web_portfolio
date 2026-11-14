@@ -1,49 +1,22 @@
-import { bayer8, ditherCells, plateMask } from '../lib/dither';
-import { catalogCode, formatDec, formatLat, formatLon, formatRA } from '../lib/coords';
+import { formatLat, formatLon } from '../lib/geo';
+import { decodeFrame, stepProgress } from '../lib/decode';
+import { buildBanks } from '../lib/implantes';
+import { bootLines } from '../features/boot/useBoot';
+import { SECTIONS } from '../app/sections';
 import { formatMonth, toYear } from '../lib/period';
-import { sketchEllipse } from '../lib/sketch';
 import { buildMailto } from '../features/contact/mailto';
-import { buildCurve } from '../features/experience/lightCurve';
-import { chartX, chartY } from '../features/projects/StarChart';
 import { projects } from '../content/projects';
 import { experiences } from '../content/experiences';
 import { profile } from '../content/profile';
-
-describe('dither', () => {
-  it('bayer8 cobre os 64 limiares distintos em [0,1)', () => {
-    const values = new Set<number>();
-    for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) values.add(bayer8(x, y));
-    expect(values.size).toBe(64);
-    for (const v of values) {
-      expect(v).toBeGreaterThanOrEqual(0);
-      expect(v).toBeLessThan(1);
-    }
-  });
-  it('preto vira tinta no centro, branco nunca, borda da placa nunca', () => {
-    const n = 16;
-    expect(ditherCells(new Float32Array(n * n).fill(0), n, n)[8 * n + 8]).toBe(true);
-    expect(ditherCells(new Float32Array(n * n).fill(1), n, n).some(Boolean)).toBe(false);
-    expect(plateMask(0, 0)).toBe(0);
-    expect(plateMask(0.5, 0.5)).toBe(1);
-  });
-});
 
 describe('coordenadas', () => {
   it('formata lat/lon de São Paulo', () => {
     expect(formatLat(-23.5505)).toBe('23°33′S');
     expect(formatLon(-46.6333)).toBe('46°38′O');
   });
-  it('formata AR, Dec e códigos de catálogo', () => {
-    expect(formatRA(19.4)).toBe('19h 24m');
-    expect(formatRA(23.999)).toBe('00h 00m');
-    expect(formatDec(-18)).toBe('−18°');
-    expect(formatDec(5)).toBe('+05°');
-    expect(catalogCode('P', 0)).toBe('P-01');
-  });
-  it('AR cresce para a esquerda na carta', () => {
-    expect(chartX(2)).toBeGreaterThan(chartX(20));
-    expect(chartY(60)).toBe(0);
-    expect(chartY(-60)).toBe(100);
+  it('formata a base de Fortaleza', () => {
+    expect(formatLat(profile.base.lat)).toBe('3°44′S');
+    expect(formatLon(profile.base.lon)).toBe('38°32′O');
   });
 });
 
@@ -57,32 +30,57 @@ describe('períodos', () => {
   });
 });
 
-describe('curva de luz', () => {
-  it('ordena por data e gera medições dentro de cada período', () => {
-    const m = buildCurve(experiences, new Date(2026, 10, 1));
-    expect(m.jobs.map((j) => j.code)).toEqual(['E1', 'E2', 'E3']);
-    expect(m.jobs[0]!.start).toBeLessThan(m.jobs[2]!.start);
-    for (const o of m.observations) {
-      const job = m.jobs.find((j) => j.id === o.id)!;
-      expect(o.year).toBeGreaterThanOrEqual(job.start);
-      expect(o.year).toBeLessThan(job.end);
-    }
-    // determinístico: mesmo resultado em toda renderização
-    expect(buildCurve(experiences, new Date(2026, 10, 1)).observations).toEqual(m.observations);
+describe('decodificar', () => {
+  it('é determinístico e termina exatamente no texto real', () => {
+    expect(decodeFrame('Varredura', 0.5, 3)).toBe(decodeFrame('Varredura', 0.5, 3));
+    expect(decodeFrame('Varredura', 1)).toBe('Varredura');
+    expect(decodeFrame('Varredura', 0).length).toBe('Varredura'.length);
+  });
+  it('revela da esquerda para a direita e preserva espaços e pontuação', () => {
+    const f = decodeFrame('Registro de serviços', 0.4, 5);
+    expect(f.startsWith('Regis')).toBe(true);
+    expect(f[8]).toBe(' ');
+    expect(decodeFrame('A — B', 0, 1)[1]).toBe(' ');
+  });
+  it('avança em degraus discretos', () => {
+    expect(stepProgress(0.3, 8)).toBe(0.375);
+    expect(stepProgress(5, 8)).toBe(1);
   });
 });
 
-describe('traço a lápis', () => {
-  it('é determinístico pela semente', () => {
-    expect(sketchEllipse(50, 50, 40, 40, 7)).toBe(sketchEllipse(50, 50, 40, 40, 7));
-    expect(sketchEllipse(50, 50, 40, 40, 7)).not.toBe(sketchEllipse(50, 50, 40, 40, 8));
+describe('implantes', () => {
+  const banks = buildBanks(profile.instruments, experiences, projects);
+  const find = (n: string) => banks.flatMap((b) => b.implants).find((i) => i.name === n)!;
+  it('cobre todos os instrumentos do perfil, sem inventar nenhum', () => {
+    const names = banks.flatMap((b) => b.implants.map((i) => i.name)).sort();
+    expect(names).toEqual([...profile.instruments].sort());
+  });
+  it('deriva a evidência do currículo', () => {
+    expect(find('React').evidence[0]).toMatchObject({ kind: 'serviço', label: '3corações', current: true });
+    expect(find('React').current).toBe(true);
+    expect(find('C#').evidence[0]).toMatchObject({ kind: 'projeto' });
+    expect(find('Python').evidence[0]!.kind).toBe('currículo');
+  });
+});
+
+describe('seções e log de boot', () => {
+  it('têm termo temático e termo comum, ids únicos', () => {
+    expect(new Set(SECTIONS.map((s) => s.id)).size).toBe(SECTIONS.length);
+    for (const s of SECTIONS) expect(s.plain.length).toBeGreaterThan(3);
+  });
+  it('o log só contém dados reais do perfil', () => {
+    const lines = bootLines(new Date(2026, 10, 13));
+    expect(lines).toHaveLength(6);
+    expect(lines.join(' ')).toContain(profile.base.city);
+    expect(lines.join(' ')).toContain(profile.handle);
+    expect(lines[5]).toBe('> alvo travado.');
   });
 });
 
 describe('mailto', () => {
   it('monta assunto e corpo codificados', () => {
     const url = buildMailto('mailto:a@b.co', { name: 'Ana', subject: '', message: 'Olá & tchau' });
-    expect(url.startsWith('mailto:a@b.co?subject=Proposta%20de%20observa%C3%A7%C3%A3o')).toBe(true);
+    expect(url.startsWith('mailto:a@b.co?subject=Contato%20pelo%20portf%C3%B3lio')).toBe(true);
     expect(decodeURIComponent(url.split('body=')[1]!)).toBe('Olá & tchau\n\n— Ana');
   });
 });
@@ -92,14 +90,8 @@ describe('conteúdo', () => {
     expect(new Set(projects.map((p) => p.id)).size).toBe(projects.length);
     expect(new Set(experiences.map((e) => e.id)).size).toBe(experiences.length);
     for (const p of projects) {
-      expect(p.ra).toBeGreaterThanOrEqual(0);
-      expect(p.ra).toBeLessThan(24);
-      expect(Math.abs(p.dec)).toBeLessThanOrEqual(55);
+      expect(['em andamento', 'concluído']).toContain(p.status);
       if (p.lesson !== undefined) expect(p.lesson.length).toBeGreaterThan(20);
-    }
-    for (const e of experiences) {
-      expect(e.scope).toBeGreaterThanOrEqual(1);
-      expect(e.scope).toBeLessThanOrEqual(10);
     }
   });
   it('texto livre de clichês', () => {

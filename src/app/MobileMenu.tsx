@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence } from 'motion/react';
+import * as motion from 'motion/react-m';
 import { SECTIONS, type SectionId } from './sections';
 import { profile } from '../content/profile';
-import { expose, exposeSequence, slew } from '../lib/motion';
+import { snap } from '../lib/motion';
+import { useMotion } from '../hooks/useMotion';
 
 interface Props {
   open: boolean;
@@ -12,9 +14,10 @@ interface Props {
 
 const FOCUSABLE = 'a[href], button:not([disabled])';
 
-/** Índice em tela cheia para telas pequenas, como o sumário de um catálogo. */
+/** Índice em tela cheia para o celular: rótulo temático + termo comum, seção ativa marcada. */
 export function MobileMenu({ open, active, onClose }: Props) {
   const panel = useRef<HTMLDivElement>(null);
+  const { animate, toggle } = useMotion();
 
   useEffect(() => {
     if (!open) return;
@@ -49,7 +52,7 @@ export function MobileMenu({ open, active, onClose }: Props) {
     };
   }, [open, onClose]);
 
-  const links = profile.links.filter((l) => l.kind !== 'cv');
+  const email = profile.links.find((l) => l.kind === 'email');
 
   return (
     <AnimatePresence>
@@ -60,50 +63,59 @@ export function MobileMenu({ open, active, onClose }: Props) {
           role="dialog"
           aria-modal="true"
           aria-label="Índice"
-          className="fixed inset-0 z-[45] flex flex-col bg-plate px-5 pt-20 pb-10 text-ink md:hidden"
-          initial={{ y: '-100%' }}
-          animate={{ y: 0 }}
-          exit={{ y: '-100%' }}
-          transition={slew}
+          className="fixed inset-0 z-[60] flex flex-col bg-void px-4 pt-16 pb-6 md:hidden"
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={snap}
         >
-          <p className="label border-b border-ink/20 pb-3">ÍNDICE</p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="hud absolute top-1.5 right-4 min-h-9 border border-data px-3 text-data"
+          >
+            Fechar
+          </button>
           <nav aria-label="Seções">
-            <motion.ul variants={exposeSequence(0.06, 0.25)} initial="hidden" animate="show">
+            <ul>
               {SECTIONS.map((s) => (
-                <motion.li key={s.id} variants={expose}>
+                <li key={s.id}>
                   <a
                     href={`#${s.id}`}
                     aria-current={active === s.id ? 'true' : undefined}
                     onClick={onClose}
-                    className="grid grid-cols-[2.5rem_1fr] items-baseline border-b border-ink/15 py-4"
+                    className={`grid min-h-[76px] grid-cols-[2.5rem_1fr] items-center gap-2 border-b border-line px-1 ${
+                      active === s.id ? 'bg-panel shadow-[inset_4px_0_0_var(--color-signal)]' : ''
+                    }`}
                   >
-                    <span className="label">{s.numeral}</span>
+                    <span className={`hud ${active === s.id ? 'text-signal' : 'text-text-3'}`}>{s.numeral}</span>
                     <span>
-                      <span className={`font-display text-2xl font-light ${active === s.id ? 'underline decoration-sodium decoration-2 underline-offset-6' : ''}`}>
-                        {s.term}
-                      </span>
-                      <span className="block font-serif italic text-ink-soft">{s.plain}</span>
+                      <span className={`display block text-3xl ${active === s.id ? 'text-signal' : ''}`}>{s.term}</span>
+                      <span className="text-[15px] leading-snug text-text-2">{s.plain}</span>
                     </span>
                   </a>
-                </motion.li>
+                </li>
               ))}
-            </motion.ul>
+            </ul>
           </nav>
 
-          <ul className="mt-auto flex flex-wrap gap-x-6 gap-y-2 font-serif text-lg">
-            {links.map((l) => (
-              <li key={l.href}>
-                <a
-                  href={l.href}
-                  target={l.kind === 'email' ? undefined : '_blank'}
-                  rel={l.kind === 'email' ? undefined : 'noopener noreferrer'}
-                  className="note-link"
-                >
-                  {l.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <div className="mt-auto flex flex-col gap-3 border-t border-line pt-4">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={animate}
+              onClick={toggle}
+              className="hud flex min-h-12 items-center justify-between border border-edge px-3.5"
+            >
+              <span>Movimento</span>
+              <span className={animate ? 'text-signal' : 'text-text-3'}>{animate ? 'on' : 'off'}</span>
+            </button>
+            {email && (
+              <a href={email.href} className="link min-h-11 py-2 font-mono text-[13px]">
+                {email.href.replace('mailto:', '')}
+              </a>
+            )}
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

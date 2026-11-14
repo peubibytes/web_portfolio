@@ -1,152 +1,91 @@
-import { useMemo, useState } from 'react';
-import { motion } from 'motion/react';
+import { useState } from 'react';
 import { experiences } from '../../content/experiences';
-import { section } from '../../app/sections';
-import { SectionHeading } from '../../components/plate/SectionHeading';
-import { PencilPath } from '../../components/plate/Pencil';
-import { expose, exposeSequence, inViewOnce } from '../../lib/motion';
+import type { Experience as Job } from '../../content/types';
 import { formatMonth } from '../../lib/period';
-import { buildCurve } from './lightCurve';
+import { SectionHeading } from '../../components/hud/SectionHeading';
 
-const W = 1000;
-const H = 340;
-const M = { l: 56, r: 24, t: 36, b: 44 };
+function Period({ job }: { job: Job }) {
+  return (
+    <span className="font-mono text-[13px] text-text">
+      {formatMonth(job.period.start)} → {formatMonth(job.period.end)}
+    </span>
+  );
+}
 
-function LightCurve({ active, onActive }: { active: string | null; onActive: (id: string | null) => void }) {
-  const model = useMemo(() => buildCurve(experiences), []);
-  const x = (year: number) => M.l + ((year - model.minYear) / (model.maxYear - model.minYear)) * (W - M.l - M.r);
-  const y = (v: number) => H - M.b - (v / 10) * (H - M.t - M.b);
-  const years = Array.from({ length: model.maxYear - model.minYear + 1 }, (_, i) => model.minYear + i);
-  const fitD = model.fit.map(([yr, v], i) => `${i ? 'L' : 'M'}${x(yr).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+function Log({ items, small }: { items: string[]; small?: boolean }) {
+  return (
+    <ul className={`grid gap-x-8 gap-y-2.5 ${small ? 'text-[15px] text-text-2' : 'text-base md:text-[17px] md:grid-cols-2'}`}>
+      {items.map((h) => (
+        <li key={h} className="grid grid-cols-[1.25rem_1fr] leading-relaxed">
+          <span aria-hidden="true" className="font-mono text-data">
+            ›
+          </span>
+          <span>{h}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Entry({ job, code, current }: { job: Job; code: string; current: boolean }) {
+  const [open, setOpen] = useState(false);
+  const company = job.company.split('·');
+  const shown = current || open ? job.highlights : job.highlights.slice(0, 1);
 
   return (
-    <figure className="-mx-4 mt-14 overflow-x-auto px-4 md:mx-0 md:mt-20 md:px-0">
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        className="h-auto w-full min-w-[640px]"
-        role="img"
-        aria-label={`Curva de luz: escopo de responsabilidade ao longo do tempo, de ${model.minYear} a ${model.maxYear}. Os detalhes estão na lista abaixo.`}
-      >
-        {/* eixos */}
-        <g className="text-paper-soft" stroke="currentColor" strokeWidth="1">
-          <line x1={M.l} y1={H - M.b} x2={W - M.r} y2={H - M.b} />
-          <line x1={M.l} y1={M.t} x2={M.l} y2={H - M.b} />
-          {years.map((yr) => (
-            <line key={yr} x1={x(yr)} y1={H - M.b} x2={x(yr)} y2={H - M.b + 6} />
-          ))}
-          {[0, 5, 10].map((v) => (
-            <line key={v} x1={M.l - 6} y1={y(v)} x2={M.l} y2={y(v)} />
-          ))}
-        </g>
-        <g className="fill-paper-soft font-mono" fontSize="12">
-          {years.map((yr) => (
-            <text key={yr} x={x(yr)} y={H - M.b + 22} textAnchor="middle">
-              {yr}
-            </text>
-          ))}
-          {[0, 5, 10].map((v) => (
-            <text key={v} x={M.l - 12} y={y(v) + 4} textAnchor="end">
-              {v}
-            </text>
-          ))}
-          <text x={M.l} y={M.t - 14} textAnchor="start">
-            escopo ↑
-          </text>
-        </g>
-
-        {/* medições: aparecem por exposição */}
-        <motion.g variants={expose} initial="hidden" whileInView="show" viewport={inViewOnce}>
-          {model.observations.map((o, i) => {
-            const hot = active === o.id;
-            return (
-              <g key={i} className={hot ? 'text-sodium' : 'text-paper'} opacity={active && !hot ? 0.35 : 0.9}>
-                <line x1={x(o.year)} x2={x(o.year)} y1={y(o.value - o.err)} y2={y(o.value + o.err)} stroke="currentColor" strokeWidth="1" />
-                <circle cx={x(o.year)} cy={y(o.value)} r={hot ? 3.4 : 2.6} fill="currentColor" />
-              </g>
-            );
-          })}
-        </motion.g>
-
-        {/* curva ajustada: traço a lápis */}
-        <PencilPath d={fitD} delay={0.4} duration={1.6} width={1.6} className="text-sodium" />
-
-        {/* identificação dos períodos */}
-        {model.jobs.map((j) => (
-          <g
-            key={j.id}
-            onMouseEnter={() => onActive(j.id)}
-            onMouseLeave={() => onActive(null)}
-            className="cursor-default"
+    <li className="grid gap-3 md:grid-cols-[10rem_1fr] md:gap-x-6">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 pt-1 md:flex-col md:items-start">
+        <Period job={job} />
+        <span className="hud text-text-3">registro {code}</span>
+        {current && <span className="hud cut-s bg-signal px-2 py-1 font-medium text-void">Atual</span>}
+      </div>
+      <article className={`relative border-l pl-5 md:pl-7 ${current ? 'border-line' : 'border-line'}`}>
+        <span
+          aria-hidden="true"
+          className={`absolute top-2 -left-[6px] size-[11px] border ${current ? 'border-signal bg-signal' : 'border-edge bg-void'}`}
+        />
+        <h3 className={`display ${current ? 'text-4xl md:text-6xl' : 'text-3xl md:text-4xl'}`}>{job.role}</h3>
+        <p className="mt-2.5 mb-4 text-lg font-medium">
+          {company[0]!.trim()}
+          {company[1] && <span className="font-normal text-text-2"> · {company[1].trim()}</span>}
+        </p>
+        <Log items={shown} small={!current} />
+        {!current && job.highlights.length > 1 && (
+          <button
+            type="button"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="hud mt-3 min-h-11 border border-edge px-3 text-data"
           >
-            <rect x={x(j.start)} y={M.t} width={x(j.end) - x(j.start)} height={H - M.t - M.b} fill="transparent" />
-            <text x={x(j.start) + 4} y={y(j.scope) - 16} className="fill-paper font-mono" fontSize="13">
-              {j.code}
-            </text>
-          </g>
-        ))}
-      </svg>
-    </figure>
+            {open ? 'Recolher ↑' : `Ver registro completo · ${job.highlights.length} ↓`}
+          </button>
+        )}
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {job.stack.map((s) => (
+            <span key={s} className={`tag ${current ? 'tag-data' : ''}`}>
+              {s}
+            </span>
+          ))}
+        </div>
+      </article>
+    </li>
   );
 }
 
 export function Experience() {
-  const s = section('experiencias');
-  const [active, setActive] = useState<string | null>(null);
-  const ordered = [...experiences].sort((a, b) => b.period.start.localeCompare(a.period.start));
-  const codeOf = (id: string) => `E${experiences.length - ordered.findIndex((e) => e.id === id)}`;
-
   return (
-    <section
-      id="experiencias"
-      aria-labelledby="exp-title"
-      className="on-dark bg-plate-dark text-paper"
-    >
-      <div className="mx-auto max-w-[88rem] px-4 py-24 md:px-10 md:py-36">
-        <SectionHeading id="exp-title" numeral={s.numeral} term={s.term} plain={s.plain} />
-        <LightCurve active={active} onActive={setActive} />
-        <p className="label mt-3 md:pl-[56px]">
-          cada ponto é um trimestre · a linha laranja é a tendência · passe o mouse num período para destacar
-        </p>
-
-        <motion.ol
-          variants={exposeSequence(0.12)}
-          initial="hidden"
-          whileInView="show"
-          viewport={inViewOnce}
-          className="mt-16 border-t border-paper/15"
-        >
-          {ordered.map((e) => (
-            <motion.li
-              key={e.id}
-              variants={expose}
-              onMouseEnter={() => setActive(e.id)}
-              onMouseLeave={() => setActive(null)}
-              onFocus={() => setActive(e.id)}
-              onBlur={() => setActive(null)}
-              tabIndex={0}
-              className={`grid gap-3 border-b border-paper/15 py-8 transition-colors outline-none md:grid-cols-12 md:gap-8 ${
-                active === e.id ? 'bg-plate-dark-2' : ''
-              }`}
-            >
-              <div className="label md:col-span-3">
-                <span className={active === e.id ? 'text-sodium' : ''}>{codeOf(e.id)}</span> · {formatMonth(e.period.start)} — {formatMonth(e.period.end)}
-              </div>
-              <div className="md:col-span-4">
-                <h3 className="font-display text-xl font-light md:text-2xl">{e.role}</h3>
-                <p className="mt-1 font-serif text-lg italic text-paper-soft">{e.company}</p>
-              </div>
-              <div className="md:col-span-5">
-                <ul className="space-y-2 font-serif text-lg leading-relaxed">
-                  {e.highlights.map((h) => (
-                    <li key={h}>{h}</li>
-                  ))}
-                </ul>
-                <p className="label mt-4">{e.stack.join(' · ')}</p>
-              </div>
-            </motion.li>
-          ))}
-        </motion.ol>
-      </div>
+    <section id="experiencias" aria-labelledby="exp-title" className="mx-auto max-w-[90rem] px-4 py-16 md:px-16 md:py-24">
+      <SectionHeading id="exp-title" sectionId="experiencias" />
+      <ol className="mt-10 flex flex-col gap-9 md:mt-14 md:gap-10">
+        {experiences.map((job, i) => (
+          <Entry
+            key={job.id}
+            job={job}
+            code={String(experiences.length - i).padStart(2, '0')}
+            current={job.period.end === 'present'}
+          />
+        ))}
+      </ol>
     </section>
   );
 }

@@ -1,12 +1,13 @@
-# Placa — portfólio
+# Sonda — portfólio
 
-> **Tese:** eu sou um objeto catalogado num levantamento do céu. O site é uma placa
-> fotográfica de observatório, digitalizada, com as anotações a lápis de quem a estudou.
-> O "cyberpunk" é a luz de sódio da cidade vazando para dentro da placa.
+> **Tese:** você está levantando a ficha de Pedro, e ele quer ser encontrado: toda trava que você rompe já estava aberta.
+> O visitante é o operador de uma Sonda; o site é a ficha que ela vai abrindo, camada por camada.
+> O tema nunca esconde a informação: nome, papel e contato estão na tela desde o primeiro frame.
 
 Toda decisão de design passa por essa frase. Se um elemento não cabe nela, ele sai.
+O plano completo (decisões, contrastes medidos, catálogo de motion, riscos) está em [`docs/plano-netrunner.md`](docs/plano-netrunner.md).
 
-React 19 + TypeScript + Vite + Tailwind v4 + Motion.
+React 19 + TypeScript + Vite + Tailwind v4 + Motion (LazyMotion).
 
 ## Rodar
 
@@ -26,50 +27,40 @@ npm run dev
 
 Todo o texto fica em `src/content/` (nenhum componente precisa mudar):
 
-- `profile.ts` — nome, bio, coordenadas da sua cidade, notas de margem, links
-- `experiences.ts` — experiências; `scope` (1–10) é a altura do ponto na curva de luz
-- `projects.ts` — projetos; `ra`/`dec` posicionam o objeto na carta, `magnitude` define o tamanho
+- `profile.ts` — nome, bio, base, formação, notas do operador, instrumentos, links
+- `experiences.ts` — experiências (o item com `end: 'present'` vira "Atual")
+- `projects.ts` — projetos (`status`: em andamento / concluído)
 
-Troque `public/avatar.svg` pela sua foto (de preferência um JPG com bom contraste:
-o retrato é convertido em pontos, então luz lateral funciona muito bem).
-Capas em `public/projects/`. Atualize as meta tags em `index.html`, `robots.txt`, `sitemap.xml`,
-e adicione `public/og.png` (1200×630) e `public/cv.pdf`.
+Os **implantes** (stack) não têm arquivo próprio: `lib/implantes.ts` cruza `profile.instruments`
+com as `experiences` e os `projects` e mostra onde cada tecnologia aparece.
+Sem porcentagens: a evidência vem do currículo.
+
+Troque `public/avatar.svg` por uma foto (de preferência com bom contraste). Adicione `public/cv.pdf`
+e `public/og.png` (1200×630) e atualize as meta tags em `index.html`, `robots.txt` e `sitemap.xml`.
 
 ## Sistema de design
 
-**Vocabulário (um só):** astronomia observacional — objeto, placa, exposição, ficha,
-curva de luz, carta, catálogo, anotação. Sempre acompanhado do termo comum
-("Curva de luz — experiência"), para nunca atrapalhar a leitura.
+**Vocabulário:** Sonda, alvo, camada, varredura, implante, arquivo, canal. Sempre acompanhado do
+termo comum ("Implantes — tecnologias"). Termos e marcas da franquia que inspirou o clima não são usados.
 
-**Cor:** placa (prata envelhecida), tinta, e **um** acento — laranja sódio.
-O sódio marca só anotações e interação, nunca decoração. Nada brilha (sem glow).
+**Cor** (tokens em `src/styles/globals.css`, contraste AA verificado): `void`/`panel`/`raised` de fundo,
+e três acentos com um papel cada — `signal` (amarelo) = o alvo e o CTA, `data` (ciano) = interação,
+`breach` (magenta) = o operador (quebras, notas, erros). Nada brilha: cor chapada, contorno duro.
 
-**Tipografia:**
-- *Unbounded* (leve) — nomes e títulos
-- *Newsreader* — texto corrido, tom de publicação científica
-- *Fragment Mono* — só dados reais (coordenadas, datas, códigos de catálogo)
-- *Reenie Beanie* — anotações a lápis, sempre curtas
+**Tipografia:** Big Shoulders (títulos) · Archivo (texto) · Martian Mono (dados). Todas OFL, Google Fonts.
 
-**Movimento — só três tipos** (`src/lib/motion.ts`):
-1. **Exposição** — aparecer por acúmulo, em degraus (`steps`)
-2. **Traço** — linhas desenhadas como lápis (`pathLength`)
-3. **Apontamento** — deslocamento mecânico de telescópio (acelera, trava)
+**Movimento — só quatro verbos** (`src/lib/motion.ts`, `src/lib/decode.ts`):
+1. **Decodificar** — texto passa de ruído ao valor real, em degraus
+2. **Travar** — brackets convergem no alvo (mira, módulos, cartões)
+3. **Romper** — a camada entra em fatias deslocadas, split RGB de 2 frames, no máx. 1 por segundo
+4. **Varrer** — o log da sessão e o envio do contato
 
-**Interação marca:** o retrato em exposição longa (`ExposurePortrait`) — começa como ruído,
-acumula luz em 1,6 s e o cursor aumenta a resolução onde passa. Sem WebGL ou com
-`prefers-reduced-motion`, vira uma imagem pontilhada estática.
-
-## Checklist anti-slop (aplicar a todo elemento novo)
-
-1. Isso existiria igual em outro portfólio?
-2. Consigo explicar em uma frase por que está aqui, ligado à tese?
-3. Se eu remover, alguém sente falta?
-4. Todo microtexto contém **informação real** (data, local, código)? Se não, sai.
-5. Mais de três tipos de animação? Corte um.
+Sem `prefers-reduced-motion` ou com o toggle "Mov · off", nenhum desses roda e a página já nasce no estado final.
+A intro (log da sessão) roda uma vez por sessão e pode ser pulada com Esc.
 
 ## Acessibilidade e performance
 
-- Contraste AA: texto de anotação usa `sodium-ink` (#9e300a), não o sódio puro.
-- `prefers-reduced-motion`: sem exposição animada, sem traços; tudo aparece direto.
-- Painel de projeto com foco preso, ESC, e link direto `#projeto-<id>`.
-- Sem bibliotecas 3D: o retrato é um shader WebGL de ~80 linhas.
+- Texto decodificado: o leitor de tela recebe só o valor real; o ruído é `aria-hidden`.
+- Painel de arquivo com foco preso, ESC e link direto `#projeto-<id>`.
+- Sem WebGL. O retrato é uma imagem com halftone em CSS.
+- Mira (cursor) só com ponteiro fino e movimento ligado; o cursor nativo permanece.

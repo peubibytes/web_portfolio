@@ -10,7 +10,7 @@ function readHash(): string | null {
   return projects.some((p) => p.id === id) ? id : null;
 }
 
-/** Projeto aberto sincronizado com a URL (#projeto-id) para permitir links diretos. */
+/** Arquivo aberto sincronizado com a URL (#projeto-id) para permitir links diretos. */
 export function useProjectHash() {
   const [openId, setOpenId] = useState<string | null>(() => readHash());
 

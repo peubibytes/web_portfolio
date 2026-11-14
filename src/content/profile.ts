@@ -13,11 +13,16 @@ export const profile: Profile = {
   ],
   marginNotes: ['Unifor, turma de 2029', 'VTEX + React + Next.js', 'o usuário vem primeiro'],
   photo: { src: '/avatar.svg', alt: 'Retrato de Pedro Barretto' },
-  base: { city: 'Fortaleza', lat: -3.7319, lon: -38.5267, utcOffset: 'UTC−3' },
+  base: { city: 'Fortaleza', lat: -3.7319, lon: -38.5267, utcOffset: 'UTC−3', timeZone: 'America/Fortaleza' },
+  education: 'Engenharia da Computação · Unifor · 2025–2029',
   observedSince: 2025,
   languages: ['Português (nativo)', 'Inglês (avançado)'],
   instruments: ['Python', 'C#', 'Java', 'C', 'JavaScript', 'TypeScript', 'React', 'Next.js', 'VTEX', 'Unity', 'Git'],
-  openTo: 'Oportunidades em Desenvolvimento de Software, Automação ou Dados',
+  focus: [
+    'Plataforma VTEX: catálogo, preços e configuração da loja',
+    'Atendimento de chamados, do diagnóstico à resolução',
+    'Front-end com React, Next.js e TypeScript',
+  ],
   links: [
     { label: 'Email', href: 'mailto:pv.barretto07@gmail.com', kind: 'email' },
     { label: 'GitHub', href: 'https://github.com/peubibytes', kind: 'github' },

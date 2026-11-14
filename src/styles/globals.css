@@ -1,37 +1,35 @@
 @import 'tailwindcss';
 
 /*
- * Placa fotográfica de observatório.
- * Placa (prata envelhecida) · tinta · um único acento: laranja sódio.
- * Sem glow, sem gradientes decorativos.
+ * Sonda — tema escuro único. Cor chapada, sem glow.
+ * Cada acento tem UM papel: signal = o alvo (Pedro, CTA) · data = interação · breach = o operador.
+ * Contrastes AA medidos em docs/plano-netrunner.md (4.2).
  */
 @theme {
-  --color-plate: #d4d0c5;
-  --color-plate-2: #c9c4b7;
-  --color-plate-dark: #161511;
-  --color-plate-dark-2: #211f1a;
-  --color-ink: #1b1a17;
-  --color-ink-soft: #55514a;
-  --color-graphite: #8c877c;
-  --color-paper: #ece8de;
-  --color-paper-soft: #a9a497;
-  --color-sodium: #ff5a1f;
-  --color-sodium-ink: #9e300a;
+  --color-void: #0b0b0f;
+  --color-panel: #14141b;
+  --color-raised: #1d1d27;
+  --color-line: #34343f; /* só decoração (1,6:1) */
+  --color-edge: #6a6a7c; /* borda de controle (≥ 3:1) */
+  --color-text: #eeede6;
+  --color-text-2: #a9a8b6;
+  --color-text-3: #8a8998;
+  --color-signal: #f3e600;
+  --color-data: #38e1ec;
+  --color-breach: #ff3b6b;
 
-  --font-display: 'Unbounded', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: 'Newsreader', ui-serif, Georgia, serif;
-  --font-mono: 'Fragment Mono', ui-monospace, monospace;
-  --font-hand: 'Reenie Beanie', cursive;
+  --font-display: 'Big Shoulders', Impact, 'Arial Narrow', sans-serif;
+  --font-sans: 'Archivo', system-ui, sans-serif;
+  --font-mono: 'Martian Mono', ui-monospace, monospace;
 
-  --ease-slew: cubic-bezier(0.7, 0, 0.2, 1);
+  --ease-snap: cubic-bezier(0.2, 0, 0, 1);
 }
 
 @layer base {
   html {
-    background: var(--color-plate);
-    color: var(--color-ink);
-    font-family: var(--font-serif);
-    font-optical-sizing: auto;
+    background: var(--color-void);
+    color: var(--color-text);
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     scroll-behavior: smooth;
     scroll-padding-top: 4.5rem;
@@ -39,69 +37,201 @@
   body {
     min-height: 100dvh;
     overflow-x: hidden;
+    background-color: var(--color-void);
+    /* A1: scanlines estáticas, 4% */
+    background-image: repeating-linear-gradient(180deg, rgb(238 237 230 / 0.035) 0 1px, transparent 1px 3px);
   }
   ::selection {
-    background: var(--color-sodium);
-    color: var(--color-ink);
+    background: var(--color-signal);
+    color: var(--color-void);
   }
   :focus-visible {
-    outline: 2px solid var(--color-sodium-ink);
+    outline: 2px solid var(--color-data);
     outline-offset: 3px;
-  }
-  .on-dark :focus-visible {
-    outline-color: var(--color-sodium);
   }
 }
 
 @layer components {
-  /* A superfície da placa: uma única camada de emulsão, estática. */
-  .emulsion {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size: 220px 220px;
-    opacity: 1;
-    mix-blend-mode: multiply;
+  /** rótulo HUD: mono, caixa alta */
+  .hud {
+    font-family: var(--font-mono);
+    font-stretch: 87.5%;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .display {
+    font-family: var(--font-display);
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 0.9;
+  }
+  /** corte diagonal em dois cantos opostos */
+  .cut {
+    clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+  }
+  .cut-s {
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
   }
 
-  /* Link de anotação: sublinhado a lápis que vira sódio no hover. */
-  .note-link {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0 1.25rem;
+    background: var(--color-signal);
+    color: var(--color-void);
+    font-family: var(--font-mono);
+    font-stretch: 87.5%;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    transition: transform 0.12s var(--ease-snap), filter 0.12s var(--ease-snap);
+  }
+  .btn:hover {
+    transform: translate(-2px, -2px);
+    filter: drop-shadow(4px 4px 0 var(--color-breach));
+  }
+  .btn:active {
+    transform: none;
+    filter: none;
+  }
+
+  .link {
+    color: var(--color-data);
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.25em;
-    text-decoration-color: var(--color-graphite);
-    transition: text-decoration-color 0.2s, color 0.2s;
+    transition: text-decoration-thickness 0.08s;
   }
-  .note-link:hover {
-    color: var(--color-sodium-ink);
-    text-decoration-color: var(--color-sodium);
-  }
-  .on-dark .note-link:hover {
-    color: var(--color-sodium);
+  .link:hover {
+    text-decoration-thickness: 2px;
   }
 
-  .label {
+  .tag {
+    display: inline-block;
+    padding: 3px 7px;
+    border: 1px solid var(--color-edge);
+    color: var(--color-text-2);
     font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.04em;
-    color: var(--color-ink-soft);
+    font-stretch: 87.5%;
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
-  .on-dark .label {
-    color: var(--color-paper-soft);
+  .tag-data {
+    border-color: var(--color-data);
+    color: var(--color-data);
+  }
+  .tag-ghost {
+    border-style: dashed;
+    color: var(--color-text-3);
   }
 
-  .hand {
-    font-family: var(--font-hand);
-    color: var(--color-sodium-ink);
-    line-height: 1;
+  /* brackets de mira (TRAVAR) — o elemento hospedeiro precisa ser relative */
+  .brackets > i {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 0 solid var(--color-text-3);
+    pointer-events: none;
+    transition:
+      inset 0.18s var(--ease-snap),
+      border-color 0.18s var(--ease-snap);
   }
-  .on-dark .hand {
-    color: var(--color-sodium);
+  .brackets > i:nth-of-type(1) { top: -8px; left: -8px; border-top-width: 2px; border-left-width: 2px; }
+  .brackets > i:nth-of-type(2) { top: -8px; right: -8px; border-top-width: 2px; border-right-width: 2px; }
+  .brackets > i:nth-of-type(3) { bottom: -8px; left: -8px; border-bottom-width: 2px; border-left-width: 2px; }
+  .brackets > i:nth-of-type(4) { bottom: -8px; right: -8px; border-bottom-width: 2px; border-right-width: 2px; }
+  .brackets:hover > i,
+  .brackets:focus-visible > i,
+  .brackets:focus-within > i,
+  .brackets.locked > i {
+    border-color: var(--color-data);
+  }
+  .brackets:hover > i:nth-of-type(1), .brackets:focus-visible > i:nth-of-type(1), .brackets:focus-within > i:nth-of-type(1), .brackets.locked > i:nth-of-type(1) { top: -3px; left: -3px; }
+  .brackets:hover > i:nth-of-type(2), .brackets:focus-visible > i:nth-of-type(2), .brackets:focus-within > i:nth-of-type(2), .brackets.locked > i:nth-of-type(2) { top: -3px; right: -3px; }
+  .brackets:hover > i:nth-of-type(3), .brackets:focus-visible > i:nth-of-type(3), .brackets:focus-within > i:nth-of-type(3), .brackets.locked > i:nth-of-type(3) { bottom: -3px; left: -3px; }
+  .brackets:hover > i:nth-of-type(4), .brackets:focus-visible > i:nth-of-type(4), .brackets:focus-within > i:nth-of-type(4), .brackets.locked > i:nth-of-type(4) { bottom: -3px; right: -3px; }
+
+  /* ROMPER: 3 fatias deslocadas, split RGB só nos frames 2–3. Uma vez por camada. */
+  .breach-host {
+    position: relative;
+  }
+  .breach-host.breaking > .breach-slice {
+    display: block;
+  }
+  .breach-slice {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: var(--color-void);
+    pointer-events: none;
+  }
+  .breach-host.breaking .slice-a {
+    animation: slice-a 0.32s steps(4, end) both;
+  }
+  .breach-host.breaking .slice-b {
+    animation: slice-b 0.32s steps(4, end) both;
+  }
+  .breach-host.breaking .slice-c {
+    animation: slice-c 0.32s steps(4, end) both;
+  }
+  @keyframes slice-a {
+    0% { clip-path: inset(0 0 66% 0); transform: translateX(-10px); opacity: 1; }
+    100% { clip-path: inset(0 0 66% 0); transform: none; opacity: 0; }
+  }
+  @keyframes slice-b {
+    0% { clip-path: inset(34% 0 34% 0); transform: translateX(26px); box-shadow: -4px 0 var(--color-breach), 4px 0 var(--color-data); opacity: 1; }
+    50% { box-shadow: none; }
+    100% { clip-path: inset(34% 0 34% 0); transform: none; box-shadow: none; opacity: 0; }
+  }
+  @keyframes slice-c {
+    0% { clip-path: inset(68% 0 0 0); transform: translateX(-18px); opacity: 1; }
+    100% { clip-path: inset(68% 0 0 0); transform: none; opacity: 0; }
+  }
+
+  /* A3: scan lento sobre o retrato */
+  .portrait-scan {
+    animation: portrait-scan 8s linear infinite;
+  }
+  @keyframes portrait-scan {
+    0%, 85% { transform: translateY(-10%); opacity: 0; }
+    86% { opacity: 0.18; }
+    100% { transform: translateY(110%); opacity: 0; }
+  }
+
+  /* A5: caret em bloco, 1 Hz */
+  .caret {
+    display: inline-block;
+    width: 0.55em;
+    height: 1.1em;
+    background: var(--color-data);
+    vertical-align: -0.15em;
+    animation: caret 1s steps(1) infinite;
+  }
+  @keyframes caret {
+    50% { opacity: 0; }
+  }
+
+  /* halftone do retrato: pontos em vez de pixels */
+  .halftone {
+    background-image: radial-gradient(circle, currentColor 1.15px, transparent 1.5px);
+    background-size: 6px 6px;
   }
 }
 
+/* Movimento desligado (sistema ou toggle): tudo no estado final */
+.no-motion *,
+.no-motion *::before,
+.no-motion *::after {
+  animation: none !important;
+  transition-duration: 0.001ms !important;
+}
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -109,8 +239,12 @@
   *,
   *::before,
   *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
+    animation: none !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+@keyframes fill {
+  from { width: 0; }
+  to { width: 100%; }
 }

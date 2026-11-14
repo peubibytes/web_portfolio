@@ -1,15 +1,15 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ProjectSheet } from '../features/projects/ProjectSheet';
+import { FilePanel } from '../features/projects/FilePanel';
 import { MobileMenu } from '../app/MobileMenu';
 import { Contact } from '../features/contact/Contact';
 import { projects } from '../content/projects';
 
-describe('ProjectSheet', () => {
+describe('FilePanel', () => {
   it('é um diálogo acessível, mostra a lição (quando houver) e fecha com ESC', async () => {
     const onClose = vi.fn();
     const project = { ...projects[0]!, lesson: 'Uma lição com mais de vinte caracteres.' };
-    render(<ProjectSheet project={project} index={0} onClose={onClose} />);
+    render(<FilePanel project={project} index={0} onClose={onClose} />);
     expect(screen.getByRole('dialog', { name: projects[0]!.title })).toBeInTheDocument();
     expect(screen.getByText('O que eu faria diferente')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'fechar (esc)' })).toHaveFocus();
@@ -23,7 +23,7 @@ describe('MobileMenu', () => {
     const onClose = vi.fn();
     render(<MobileMenu open active="projetos" onClose={onClose} />);
     expect(screen.getByRole('dialog', { name: 'Índice' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Carta de objetos/ })).toHaveAttribute('aria-current', 'true');
+    expect(screen.getByRole('link', { name: /Arquivos extraídos/ })).toHaveAttribute('aria-current', 'true');
     expect(screen.getByText('projetos selecionados')).toBeInTheDocument();
     await userEvent.keyboard('{Escape}');
     expect(onClose).toHaveBeenCalled();
@@ -35,6 +35,6 @@ describe('Contact', () => {
     render(<Contact />);
     expect(screen.getByRole('textbox', { name: 'Seu nome' })).toBeRequired();
     expect(screen.getByRole('textbox', { name: 'Mensagem' })).toBeRequired();
-    expect(screen.getByRole('button', { name: 'Escrever email' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /escrever email/i })).toBeInTheDocument();
   });
 });

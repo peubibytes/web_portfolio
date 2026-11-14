@@ -1,39 +1,33 @@
 import type { Transition, Variants } from 'motion/react';
 
 /**
- * O site usa SÓ três tipos de movimento. Não adicione um quarto.
+ * A Sonda usa SÓ quatro verbos de movimento. Não adicione um quinto.
  *
- * 1. EXPOSIÇÃO   — algo aparece por acúmulo de luz, em degraus.
- * 2. TRAÇO       — uma linha é desenhada como lápis (pathLength).
- * 3. APONTAMENTO — deslocamento mecânico de telescópio: acelera, trava.
+ * 1. DECODIFICAR — texto passa de ruído ao valor real, em degraus (lib/decode.ts).
+ * 2. TRAVAR      — brackets convergem e o alvo trava: aceleração seca, sem mola elástica.
+ * 3. ROMPER      — a camada entra em fatias deslocadas + split RGB de 2 frames (CSS .breach).
+ * 4. VARRER      — uma linha percorre uma área e revela o que está embaixo.
  */
 
-/** easing em degraus: a placa "recebe luz" em 6 etapas */
+export const EASE_SNAP = [0.2, 0, 0, 1] as const;
+export const EASE_SWEEP = [0.45, 0, 0.55, 1] as const;
+
+export const snap: Transition = { duration: 0.26, ease: EASE_SNAP };
+
 export const stepped =
-  (n = 6) =>
+  (n = 8) =>
   (t: number) =>
     Math.min(1, Math.ceil(t * n) / n);
 
-export const EASE_SLEW = [0.7, 0, 0.2, 1] as const;
-
-// 1. Exposição
-export const expose: Variants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { duration: 0.6, ease: stepped(6) } },
+/** TRAVAR em lista: módulos encaixam em sequência. */
+export const lockIn: Variants = {
+  hidden: { opacity: 0, x: -12 },
+  show: { opacity: 1, x: 0, transition: snap },
 };
 
-export const exposeSequence = (step = 0.12, delay = 0): Variants => ({
+export const lockSequence = (step = 0.04, delay = 0): Variants => ({
   hidden: {},
   show: { transition: { staggerChildren: step, delayChildren: delay } },
 });
-
-// 2. Traço
-export const drawTransition = (delay = 0, duration = 0.9): Transition => ({
-  pathLength: { delay, duration, ease: [0.45, 0, 0.25, 1] },
-  opacity: { delay, duration: 0.01 },
-});
-
-// 3. Apontamento
-export const slew: Transition = { duration: 0.55, ease: EASE_SLEW };
 
 export const inViewOnce = { once: true, margin: '-12% 0px' } as const;

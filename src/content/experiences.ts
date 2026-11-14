@@ -6,7 +6,6 @@ export const experiences: Experience[] = [
     role: 'Estagiário de E-commerce (TI)',
     company: '3corações · Sistemas Especialistas',
     period: { start: '2026-09', end: 'present' },
-    scope: 7,
     highlights: [
       'Atendo chamados de usuários internos, do diagnóstico à resolução de incidentes e demandas da plataforma de e-commerce.',
       'Faço cadastros, parametrizações e manutenção na VTEX: catálogo, produtos, preços e configurações da loja.',
@@ -22,7 +21,6 @@ export const experiences: Experience[] = [
     role: 'Atendente',
     company: 'Portal Tabacaria',
     period: { start: '2025-02', end: '2025-12' },
-    scope: 3,
     highlights: [
       'Atendimento focado na experiência do cliente, identificando e resolvendo necessidades específicas com agilidade.',
       'Gestão de fluxo de caixa e processamento de transações financeiras com rigor de precisão.',
@@ -35,7 +33,6 @@ export const experiences: Experience[] = [
     role: 'Atendente',
     company: "McDonald's",
     period: { start: '2024-01', end: '2024-04' },
-    scope: 2,
     highlights: [
       'Atendimento direto ao público em ambiente de alto volume, com comunicação assertiva e resolução ágil de conflitos.',
       'Trabalho em equipe sob alta pressão, seguindo protocolos e padrões de qualidade internacionais.',
