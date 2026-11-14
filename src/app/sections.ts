@@ -3,7 +3,7 @@ export const SECTIONS = [
   { id: 'sobre', numeral: '01', nav: 'Perfil', term: 'Perfil', plain: 'quem sou eu' },
   { id: 'habilidades', numeral: '02', nav: 'Habilidades', term: 'Habilidades', plain: 'tecnologias' },
   { id: 'experiencias', numeral: '03', nav: 'Registro', term: 'Registro de serviços', plain: 'experiência profissional, de 2024 até hoje' },
-  { id: 'projetos', numeral: '04', nav: 'Projetos', term: 'Projetos', plain: 'GitHub e Roblox' },
+  { id: 'projetos', numeral: '04', nav: 'Projetos', term: 'Projetos', plain: 'projetos no GitHub' },
   { id: 'contato', numeral: '05', nav: 'Canal', term: 'Canal aberto', plain: 'contato' },
 ] as const;
 
